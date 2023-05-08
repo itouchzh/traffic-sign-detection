@@ -4,18 +4,20 @@
 # @Software: PyCharm
 # @File    : connection.py
 from flask import Flask
+from flask_cors import CORS
+
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app)
 # 连接数据库
 app.config[
     'SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:hyj@127.0.0.1:3306/user_db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # 查询时会显示原始SQL语句
-app.config['SQLALCHEMY_ECHO'] = True
+# app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
-
 
 # try:
 #     db.session.execute("SELECT 1")
@@ -33,6 +35,7 @@ db = SQLAlchemy(app)
 # for name in table_names:
 #     print(name)
 
+
 # 数据库模型类
 class User(db.Model):
     # 定义表名字
@@ -43,7 +46,8 @@ class User(db.Model):
     password = db.Column(db.String(32), unique=False)
     email = db.Column(db.String(32), unique=False)
     phone = db.Column(db.String(32), unique=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    created_at = db.Column(
+        db.DateTime, default=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     address = db.Column(db.String(32), unique=False)
     car_number = db.Column(db.String(32), unique=True)
     car_id = db.Column(db.String(32), unique=True)
@@ -78,5 +82,3 @@ class Car(db.Model):
     # User希望有role属性，但是在别的模型中定义，即上面的backref=role
     def __repr__(self):
         return '<Car: %s %s %s>' % (self.id, self.owner, self.car_number)
-
-

@@ -1,6 +1,10 @@
 from flask import Flask
 from views import *
 from database.connection import app
+from utils.token import login,get_captcha
+
+app.route('/login')(login)
+app.route('/getCaptcha')(get_captcha)
 
 
 app.route('/user/<int:user_id>')(get_user)
