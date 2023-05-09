@@ -4,14 +4,17 @@ import { Navigate } from 'react-router-dom'
 // import Home from '@/views/Home'
 // 懒加载
 // const About = lazy(() => import('@/views/About'))
+import Loading from '@/views/Loading/Loading'
 const Home = lazy(() => import('@/views/Home/Home'))
 const Login = lazy(() => import('@/views/Login/Login'))
-// const User = lazy(() => import('@/views/User/User'))
+const User = lazy(() => import('@/views/User/User'))
+const Detection = lazy(() => import('@/views/Detection/Detection'))
+
 // const Classes = lazy(() => import('@/views/Classes/Classes'))
 // const Detection = lazy(() => import('@/views/Detection/Detection/Detection'))
 // const Results = lazy(() => import('@/views/Detection/Results/Restults'))
 
-const suspense = (comp: JSX.Element) => <Suspense fallback={<div>Loading...</div>}>{comp}</Suspense>
+const suspense = (comp: JSX.Element) => <Suspense fallback={<Loading/>}>{comp}</Suspense>
 
 const routes = [
     {
@@ -22,9 +25,23 @@ const routes = [
         path: '/login',
         element: suspense(<Login />),
     },
+    // {
+    //     path: '/home',
+    //     element: suspense(<Home />),
+    // },
     {
         path: '/home',
         element: suspense(<Home />),
+        children: [
+            {
+                path: 'user',
+                element: suspense(<User />),
+            },
+            {
+                path: 'detection',
+                element: suspense(<Detection />),
+            },
+        ],
     },
 ]
 export default routes

@@ -1,35 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { LockOutlined, UserOutlined, KeyOutlined } from '@ant-design/icons'
-import { Button, Checkbox, Form, Input } from 'antd'
+import { Button, Checkbox, Form, Input, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
+import { setLocalStorage } from '@/services/storage'
 import initLoginBg from './init'
 import './login.scss'
 
 import { getCaptcha, login } from '@/services/user'
 const Login: React.FC = () => {
-    const navigate = useNavigate()
-
-    const onFinish = (values: any) => {
-        // if (values.username === 'admin' && values.password == '123456') {
-        //     navigate('/home')
-        // }
-        // const userLogin = async () => {
-        //     const res = await login({
-        //         username: 'admin',
-        //         password: '123456',
-        //         captcha: '1234',
-        //     })
-        //     console.log(res)
-        // }
-        // userLogin()
-        console.log(values)
-    }
-    useEffect(() => {
-        initLoginBg()
-        window.onresize = function () {
-            initLoginBg()
-        }
-    })
     // 获取验证码：
     const [captcha, setCaptcha] = useState('')
     const requesetCaptcha = async () => {
@@ -44,42 +22,66 @@ const Login: React.FC = () => {
         requesetCaptcha()
     }
 
+    const navigate = useNavigate()
+    // const [messageApi, contextHolder] = message.useMessage()
+    const onFinish = async (values: any) => {
+        // if (values.username === 'admin' && values.password == '123456') {
+        //     navigate('/home')
+        // }
+
+        const { data: res } = await login({
+            username: values.username,
+            password: values.password,
+            vercode: values.vercode,
+        })
+        console.log(res)
+        if (res.error) {
+            // console.log(res.data.error);
+            message.error(res.error)
+            requesetCaptcha()
+        }
+        setLocalStorage('token', res.token)
+        navigate('/home')
+        message.success('登录成功')
+    }
+    useEffect(() => {
+        initLoginBg()
+        window.onresize = function () {
+            initLoginBg()
+        }
+    })
+
     return (
         <div className="login-main">
             <canvas id="canvas" style={{ display: 'block' }}></canvas>
             <Form
                 name="normal_login"
                 className="login-form"
-                initialValues={{ remember: true, username: 'admin', password: '123456' }}
+                initialValues={{ username: 'admin', password: '123456' }}
                 onFinish={onFinish}
             >
                 <h1 className="title">知行交通标志检测系统</h1>
-                <Form.Item
-                    name="username"
-                    rules={[{ required: true, message: 'Please input your Username!' }]}
-                >
+                <Form.Item name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
                     <Input
                         prefix={<UserOutlined className="site-form-item-icon" />}
                         placeholder="Username"
                     />
                 </Form.Item>
-                <Form.Item
-                    name="password"
-                    rules={[{ required: true, message: 'Please input your Password!' }]}
-                >
+                <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
                     <Input
                         prefix={<LockOutlined className="site-form-item-icon" />}
                         type="password"
                         placeholder="Password"
                     />
                 </Form.Item>
-                <Form.Item
-                    // name="verificationCode"
-                    // rules={[{ required: true, message: 'Please input your Password!' }]}
-
-                    className="h-8"
-                >
-                    <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 10px)' }}>
+                {/* 验证码 */}
+                <Form.Item className="h-8">
+                    <Form.Item
+                        style={{ width: 'calc(50% - 10px)' }}
+                        className="inline-block"
+                        name="vercode"
+                        rules={[{ required: true, message: '请输入验证码' }]}
+                    >
                         <Input
                             prefix={<KeyOutlined className="site-form-item-icon" />}
                             type="text"
@@ -112,7 +114,6 @@ const Login: React.FC = () => {
                     Or <a href="">现在注册</a>
                 </Form.Item>
             </Form>
-            {/* <h1 className='bg-slate-300 w-6 h-4 '>Hello World</h1> */}
         </div>
     )
 }
