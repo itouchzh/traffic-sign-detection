@@ -61,13 +61,13 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'password': self.password,
+            # 'password': self.password,
             'email': self.email,
             'phone': self.phone,
-            'created_at': self.created_at,
+            'createdAt': self.created_at,
             'address': self.address,
-            'car_number': self.car_number,
-            'car_id': self.car_id
+            'carNumber': self.car_number,
+            'carId': self.car_id
         }
 
 

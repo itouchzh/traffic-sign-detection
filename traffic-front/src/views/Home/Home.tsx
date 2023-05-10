@@ -89,7 +89,7 @@ const Home: React.FC = () => {
                             },
                         ]}
                     ></Breadcrumb>
-                    <div style={{ padding: 24, minHeight: '95%', background: colorBgContainer }} >
+                    <div style={{ padding: 24, minHeight: '90%', background: colorBgContainer }} >
                         <Outlet />
                     </div>
                 </Content>

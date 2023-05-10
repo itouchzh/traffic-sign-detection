@@ -1,137 +1,159 @@
-import React, { useState } from 'react';
-import { Button, Radio, Space, Table, Tag } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-
+import React, { useEffect, useState } from 'react'
+import {
+    Button,
+    Radio,
+    Space,
+    Table,
+    Tag,
+    Modal,
+    Form,
+    Input,
+    Select,
+    DatePicker,
+    Switch,
+} from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import { getAllUsers } from '@/services/user'
 interface DataType {
-  key: string;
-  name: string;
-  age: number;
-  address: string;
-  tags: string[];
+    id: string
+    username: string
+    phone: string
+    address: string
+    carNumber: string
+    carId: string
+    email: string
+    createAt: string
 }
 
-type TablePaginationPosition =
-  | 'topLeft'
-  | 'topCenter'
-  | 'topRight'
-  | 'bottomLeft'
-  | 'bottomCenter'
-  | 'bottomRight';
-
-const topOptions = [
-  { label: 'topLeft', value: 'topLeft' },
-  { label: 'topCenter', value: 'topCenter' },
-  { label: 'topRight', value: 'topRight' },
-  { label: 'none', value: 'none' },
-];
-
-const bottomOptions = [
-  { label: 'bottomLeft', value: 'bottomLeft' },
-  { label: 'bottomCenter', value: 'bottomCenter' },
-  { label: 'bottomRight', value: 'bottomRight' },
-  { label: 'none', value: 'none' },
-];
-
-const columns: ColumnsType<DataType> = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: (tags: string[]) => (
-      <span>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </span>
-    ),
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (_, record) => (
-      <Space size="middle">
-        <Button type='link'>Invite {record.name}</Button>
-        <Button type="dashed" danger>Delete</Button>
-      </Space>
-    ),
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
-
 const App: React.FC = () => {
-  const [top, setTop] = useState<TablePaginationPosition>('topLeft');
-  const [bottom, setBottom] = useState<TablePaginationPosition>('bottomRight');
+    const [modal2Open, setModal2Open] = useState(false)
+    const columns: ColumnsType<DataType> = [
+        {
+            title: '用户Id',
+            dataIndex: 'id',
+            key: 'id',
+        },
+        {
+            title: '用户名',
+            dataIndex: 'username',
+            key: 'username',
+        },
+        {
+            title: '电话号码',
+            dataIndex: 'phone',
+            key: 'phone',
+        },
+        {
+            title: '地址',
+            dataIndex: 'address',
+            key: 'address',
+        },
+        {
+            title: '邮箱',
+            dataIndex: 'email',
+            key: 'email',
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: () => (
+                <Space size="middle">
+                    <Button
+                        type="link"
+                        onClick={() => {
+                            setModal2Open(true)
+                        }}
+                    >
+                        编辑
+                    </Button>
+                    <Button danger>删除</Button>
+                </Space>
+            ),
+        },
+    ]
 
-  return (
-    <div>
-      <div>
-        <Radio.Group
-          style={{ marginBottom: 10 }}
-          options={topOptions}
-          value={top}
-          onChange={(e) => {
-            setTop(e.target.value);
-          }}
-        />
-      </div>
-      <Radio.Group
-        style={{ marginBottom: 10 }}
-        options={bottomOptions}
-        value={bottom}
-        onChange={(e) => {
-          setBottom(e.target.value);
-        }}
-      />
-      <Table columns={columns} pagination={{ position: [top, bottom] }} dataSource={data} />
-    </div>
-  );
-};
+    const [users, setUsers] = useState<DataType[]>([])
+    useEffect(() => {
+        const getUsers = async () => {
+            const { data: res } = await getAllUsers()
+            setUsers(res)
+        }
+        getUsers()
+    }, [])
 
-export default App;
+    return (
+        <div>
+            <Table
+                columns={columns}
+                pagination={{ position: ['bottomRight'] }}
+                dataSource={users}
+                rowKey={(record) => record.id}
+            />
+            <Modal
+                title="修改用户信息"
+                centered
+                open={modal2Open}
+                onOk={() => setModal2Open(false)}
+                onCancel={() => setModal2Open(false)}
+            >
+                <Form
+                    name="basic"
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    style={{ maxWidth: 600 }}
+                    initialValues={{ remember: true }}
+                    // onFinish={onFinish}
+                    // onFinishFailed={onFinishFailed}
+                    autoComplete="off"
+                >
+                    <Form.Item label="Username" name="username">
+                        <Input />
+                    </Form.Item>
+
+                    <Form.Item label="Phone" name="phone">
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="地址" name="address">
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="Email">
+                        <Space.Compact>
+                            <Form.Item name={['email']} noStyle>
+                                <Input style={{ width: '100%' }} placeholder="输入邮箱" />
+                            </Form.Item>
+                            <Form.Item
+                                // name={['email']}
+                                noStyle
+                            >
+                                <Select placeholder="选择邮箱">
+                                    <Select.Option value="qq">@qq.com</Select.Option>
+                                    <Select.Option value="gamil">@gmail.com</Select.Option>
+                                    <Select.Option value="163">@163.com</Select.Option>
+                                    <Select.Option value="126">@126.com</Select.Option>
+                                    <Select.Option value="outlook">@outlook.com</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Space.Compact>
+                    </Form.Item>
+                    <Form.Item label="车牌号" name="carNumber">
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="DatePicker">
+                        <DatePicker />
+                    </Form.Item>
+                    <Form.Item label="状态" valuePropName="checked">
+                        <Switch />
+                    </Form.Item>
+                    <Form.Item label="身份">
+                        <Select>
+                            <Select.Option value="admin">管理员</Select.Option>
+                            <Select.Option value="commonUser">用户</Select.Option>
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </div>
+    )
+}
+
+export default App

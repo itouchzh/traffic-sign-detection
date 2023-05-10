@@ -17,4 +17,8 @@ export const login = (params: LoginParams) => {
 }
 
 
+export const getAllUsers = () => {
+    return request.get('/getAllUsers')
+}
+
 
