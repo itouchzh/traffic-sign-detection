@@ -2,7 +2,7 @@ import React from 'react'
 import { Space, Spin } from 'antd'
 
 const Loading: React.FC = () => (
-    <Space size="middle">
+    <Space size="large" className="w-full h-full flex justify-center items-center">
         <Spin size="large" />
     </Space>
 )

@@ -47,7 +47,6 @@ def get_captcha():
     buffered = BytesIO()
     img.save(buffered, format="JPEG")
     img_str = base64.b64encode(buffered.getvalue()).decode('ascii')
-    print('我己经被调用了')
     return jsonify({'captchaImg': f"data:image/jpeg;base64,{img_str}", 'captcha': captcha})
 
 # 生成token

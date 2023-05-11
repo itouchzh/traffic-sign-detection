@@ -39,6 +39,7 @@ const Login: React.FC = () => {
             // console.log(res.data.error);
             message.error(res.error)
             requesetCaptcha()
+            return 
         }
         setLocalStorage('token', res.token)
         navigate('/home')
