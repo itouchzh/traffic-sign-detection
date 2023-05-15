@@ -9,12 +9,13 @@ const Home = lazy(() => import('@/views/Home/Home'))
 const Login = lazy(() => import('@/views/Login/Login'))
 const User = lazy(() => import('@/views/User/User'))
 const Detection = lazy(() => import('@/views/Detection/Detection'))
+const Results = lazy(() => import('@/views/Results/Results'))
 
 // const Classes = lazy(() => import('@/views/Classes/Classes'))
 // const Detection = lazy(() => import('@/views/Detection/Detection/Detection'))
 // const Results = lazy(() => import('@/views/Detection/Results/Restults'))
 
-const suspense = (comp: JSX.Element) => <Suspense fallback={<Loading/>}>{comp}</Suspense>
+const suspense = (comp: JSX.Element) => <Suspense fallback={<Loading />}>{comp}</Suspense>
 
 const routes = [
     {
@@ -40,6 +41,10 @@ const routes = [
             {
                 path: 'detection',
                 element: suspense(<Detection />),
+            },
+            {
+                path: 'results',
+                element: suspense(<Results />),
             },
         ],
     },

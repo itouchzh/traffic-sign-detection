@@ -82,3 +82,5 @@ class Car(db.Model):
     # User希望有role属性，但是在别的模型中定义，即上面的backref=role
     def __repr__(self):
         return '<Car: %s %s %s>' % (self.id, self.owner, self.car_number)
+
+

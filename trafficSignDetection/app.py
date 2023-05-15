@@ -13,6 +13,10 @@ app.route('/getOneUser')(find_user_by_id)
 app.route('/deteteUser/<int:id>')(detele_user)
 
 
+# 文件模块
+app.route('/uploadFile')(upload_file)
+
+
 app.route('/test')(test)
 app.route('/getCar')(get_all_car)
 if __name__ == '__main__':

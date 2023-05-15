@@ -34,6 +34,7 @@ function getItem(
 const siderMenuItems: MenuItem[] = [
     getItem('用户管理', '/home/user', <PieChartOutlined />),
     getItem('交通标志检测', '/home/detection', <DesktopOutlined />),
+    getItem('检测结果', '/home/results', <DesktopOutlined />),
 ]
 
 const Home: React.FC = () => {

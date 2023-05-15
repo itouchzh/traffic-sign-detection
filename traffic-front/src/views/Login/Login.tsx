@@ -60,6 +60,7 @@ const Login: React.FC = () => {
                 className="login-form"
                 initialValues={{ username: 'admin', password: '123456' }}
                 onFinish={onFinish}
+                autoComplete="off"
             >
                 <h1 className="title">知行交通标志检测系统</h1>
                 <Form.Item name="username" rules={[{ required: true, message: '请输入用户名!' }]}>

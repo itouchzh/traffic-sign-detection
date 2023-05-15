@@ -11,6 +11,7 @@ import {
     Switch,
     Card,
     message,
+    Pagination
 } from 'antd'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
@@ -190,10 +191,8 @@ const App: React.FC = () => {
                     name="findUserForm"
                     labelCol={{ span: 5 }}
                     initialValues={{ remember: true }}
-                    // onFinish={onFinish}
-                    // onFinishFailed={onFinishFailed}
                     autoComplete="off"
-                    className="min-w-xs flex justify-around"
+                    className="min-w-xs flex justify-start gap-10"
                     form={findUserForm}
                 >
                     <Form.Item label="用户Id" name="id">
@@ -215,11 +214,18 @@ const App: React.FC = () => {
                     </Form.Item>
                 </Form>
             </Card>
+            
             <Table
                 columns={columns}
-                pagination={{ position: ['bottomRight'], pageSize: 10 }}
+                pagination={{
+                    position: ['bottomRight'],
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                }}
                 dataSource={users}
                 rowKey={(record) => record.id}
+
                 // onRow={(record) => {
                 //     return {
                 //         onClick: () => handleClickRow(record),

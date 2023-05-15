@@ -95,3 +95,15 @@ def get_all_car():
 def test():
     count = User.query.count()
     return jsonify({'count': count})
+
+
+
+@app.route('/uploadFile', methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    print(file)
+    if file:
+        # 处理文件
+        return '文件上传成功'
+    else:
+        return '文件上传失败'
