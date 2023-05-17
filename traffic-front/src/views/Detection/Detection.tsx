@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Button,
     Cascader,
@@ -13,10 +13,12 @@ import {
     Card,
     Upload,
     Modal,
+    Image,
 } from 'antd'
 import { InboxOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons'
 import type { RcFile, UploadProps } from 'antd/es/upload'
 import type { UploadFile } from 'antd/es/upload/interface'
+import { uploadImages } from '@/services/upload'
 type SizeType = Parameters<typeof Form>[0]['size']
 
 const normFile = (e: any) => {
@@ -44,15 +46,8 @@ const Detection: React.FC = () => {
 
     const [previewOpen, setPreviewOpen] = useState(false)
     const [previewImage, setPreviewImage] = useState('')
-    const [previewTitle, setPreviewTitle] = useState('')
-    const [fileList, setFileList] = useState<UploadFile[]>([
-        {
-            uid: '-1',
-            name: 'image.png',
-            status: 'done',
-            url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-        },
-    ])
+    const [previewTitle, setPreviewTitle] = useState('交通标志检测')
+
     const handleCancel = () => setPreviewOpen(false)
 
     const handlePreview = async (file: UploadFile) => {
@@ -64,9 +59,21 @@ const Detection: React.FC = () => {
         setPreviewOpen(true)
         // setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1))
     }
-
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-        setFileList(newFileList)
+    const [fileList, setFileList] = useState<UploadFile[]>([])
+    useEffect(() => {})
+    const handleChange: UploadProps['onChange'] = ({
+        file: newFile,
+        fileList: newFileList,
+        event: e,
+    }) => {
+        setFileList([])
+        if (newFile.status !== 'removed') {
+            setFileList((value) => [...value, ...newFileList])
+        }
+        if (newFile.percent == 100) {
+            getCurrentImages()
+        }
+        console.log(newFile)
     }
 
     const uploadButton = (
@@ -75,11 +82,35 @@ const Detection: React.FC = () => {
             <div style={{ marginTop: 8 }}>Upload</div>
         </div>
     )
-    const beforeUpload = (file: UploadFile,fileList: object[]) => {
-        console.log('Selected file:', file)
-        console.log(fileList);
-        
+
+    // const beforeUpload = (file: UploadFile, fileLists: UploadFile[]) => {
+    //     setFileList((fileList) => [...fileList, file])
+    // }
+    // 得到目前的图
+    const [currentImages, setCurrentImages] = useState<string[]>([]);
+
+    const getCurrentImages = async () => {
+        const cur = await Promise.all(
+            fileList.map(async (item, index) => await getBase64(item.originFileObj as RcFile))
+        );
+        setCurrentImages(cur);
+    };
+    
+    const [detectionResults, setDetectionResults] = useState([])
+    const onFinish = async () => {
+        const sendImages = await Promise.all(
+            fileList.map(async (item, index) => {
+                return {
+                    image: await getBase64(item.originFileObj as RcFile),
+                    name: item.uid,
+                }
+            })
+        )
+        const { data: res } = await uploadImages(sendImages)
+        console.log(res)
+        setDetectionResults(res.images)
     }
+
     return (
         <>
             {' '}
@@ -88,6 +119,7 @@ const Detection: React.FC = () => {
                 wrapperCol={{ span: 8 }}
                 layout="horizontal"
                 onValuesChange={onFormLayoutChange}
+                onFinish={onFinish}
             >
                 <Form.Item label="Input">
                     <Input />
@@ -107,20 +139,22 @@ const Detection: React.FC = () => {
                 <Form.Item label="Switch" valuePropName="checked">
                     <Switch />
                 </Form.Item>
-                <Form.Item label="Button">
-                    <Button>Button</Button>
+                <Form.Item label="开始检测">
+                    <Button type="primary" htmlType="submit">
+                        开始检测
+                    </Button>
                 </Form.Item>
             </Form>
             <Card>
-                <Form labelCol={{ span: 4 }} wrapperCol={{ span: 8 }} layout="horizontal">
-                    <Form.Item
+                <Form labelCol={{ span: 12 }} wrapperCol={{ span: 24 }} layout="horizontal">
+                    {/* <Form.Item
                         name="upload"
                         label="上传图片"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
                         extra="上传交通图片用于交通标志识别"
                     >
-                        <Upload name="logo" action="/upload.do" listType="picture">
+                        <Upload name="logo" action="" listType="picture">
                             <Button icon={<UploadOutlined />}>Click to upload</Button>
                         </Upload>
                     </Form.Item>
@@ -128,21 +162,21 @@ const Detection: React.FC = () => {
                         <Upload directory>
                             <Button icon={<UploadOutlined />}>Upload Directory</Button>
                         </Upload>
-                    </Form.Item>
+                    </Form.Item> */}
                     <Form.Item>
                         <Upload
-                            // action="/"
+                            action=""
                             listType="picture-card"
                             fileList={fileList}
-                            // onPreview={handlePreview}
+                            onPreview={handlePreview}
                             onChange={handleChange}
-                            beforeUpload={(file,fileList) => beforeUpload(file,fileList)}
+                            // beforeUpload={(file, fileList) => beforeUpload(file, fileList)}
                         >
                             {fileList.length >= 8 ? null : uploadButton}
                         </Upload>
                         <Modal
                             open={previewOpen}
-                            // title={previewTitle}
+                            title={previewTitle}
                             footer={null}
                             onCancel={handleCancel}
                         >
@@ -150,6 +184,24 @@ const Detection: React.FC = () => {
                         </Modal>
                     </Form.Item>
                 </Form>
+                <h1 className=" m-5 text-2xl">原始图片</h1>
+                <Image.PreviewGroup>
+                    {currentImages.map((item, index) => (
+                        <Image
+                            key={index}
+                            style={{ width: '384px' }}
+                            src={item}
+                        ></Image>
+                    ))}
+                </Image.PreviewGroup>
+            </Card>
+            <h1 className="m-5 text-2xl">检测结果图</h1>
+            <Card>
+                <Image.PreviewGroup>
+                    {detectionResults.map((item, index) => (
+                        <Image key={index} style={{ width: '384px' }} src={item}></Image>
+                    ))}
+                </Image.PreviewGroup>
             </Card>
         </>
     )
