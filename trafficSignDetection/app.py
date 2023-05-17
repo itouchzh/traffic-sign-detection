@@ -1,5 +1,6 @@
 from flask import Flask
 from views import *
+from detection.images import *
 from database.connection import app
 from utils.token import login, get_captcha
 
@@ -15,7 +16,7 @@ app.route('/deteteUser/<int:id>')(detele_user)
 
 # 文件模块
 app.route('/uploadFile')(upload_file)
-
+app.route('/getImages')(detect_image)
 
 app.route('/test')(test)
 app.route('/getCar')(get_all_car)

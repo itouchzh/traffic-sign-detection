@@ -84,3 +84,14 @@ class Car(db.Model):
         return '<Car: %s %s %s>' % (self.id, self.owner, self.car_number)
 
 
+# 图片表
+class Image(db.Model):
+    __tablename__ = 'images'
+
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255), nullable=False)
+    data = db.Column(db.LargeBinary, nullable=False)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
+
+    def serialize(self):
+        return {'id': self.id, 'filename': self.filename, 'data': self.data}
