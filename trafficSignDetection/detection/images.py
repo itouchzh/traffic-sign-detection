@@ -22,17 +22,43 @@ def detect_image():
     image_data = []
     res = []
     for item in images:
-        filename = item['name']
-        curImage = base64.b64decode(item['image'])
-        image_data.append({'filename': filename, 'data': curImage})
+        print(item['conf'], item['iou'])
+        # curImage = base64.b64decode(item['image'])
+        # image_data.append({'filename': filename, 'data': curImage})
         # 检测
-        res.append('data:image/jpeg;base64,' + get_result(base64_string=item['image'][23:]))
+        detection_result = get_result(base64_string=item['image'][23:])
+        if detection_result['detection_info'] != []:
+            res.append({
+                'img':
+                'data:image/jpeg;base64,' + detection_result['base64_image'],
+                'detectionInfo':
+                detection_result['detection_info'],
+                'objectNum':
+                len(detection_result['detection_info'])
+            })
+        else:
+            res.append({
+                'img':
+                'data:image/jpeg;base64,' + detection_result['base64_image'],
+                'objectNum':
+                0
+            })
+        image_data.append({
+            'filename':
+            item['name'],
+            'currentImage':
+            base64.decode(item['image']),
+            'resultImage':
+            base64.decode('data:image/jpeg;base64,' +
+                          detection_result['base64_image']),
+        })
     # 存储到数据库
     # db.session.bulk_insert_mappings(Image, image_data)
     # db.session.commit()
     # print(images)
     # image_data = base64.b64decode(images)
-    return jsonify({'status': 200, 'message': 'success', 'images': res})
+    # print(detection_result)
+    return jsonify({'status': 200, 'message': 'success', 'results': res})
 
 
 @app.route('/detectionResultes', methods=['GET'])

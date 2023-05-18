@@ -8,7 +8,8 @@ import numpy as np
 from io import BytesIO
 from PIL import Image
 # from utils.yolo_utils import non_max_suppression, letterbox, scale_coords, plot_one_box
-from yolo.utils.yolo_utils import non_max_suppression, letterbox,scale_coords,plot_one_box
+from yolo.utils.yolo_utils import non_max_suppression, letterbox, scale_coords, plot_one_box
+
 
 def jpg_to_base64():
     image_path = './00637.jpg'
@@ -17,8 +18,8 @@ def jpg_to_base64():
         image.save(buffer, format('JPEG'))
         image_bytes = buffer.getvalue()
     base64_string = base64.b64encode(image_bytes).decode('utf-8')
-    print(base64_string)
     return base64_string
+
 
 def base64_to_jpg(base64_string):
     # 将Base64字符串解码为字节流
@@ -39,6 +40,7 @@ def base64_to_jpg(base64_string):
     # 返回JPEG图像
     return image
 
+
 def process_image(image):
     img = image
     image, ratio, dwdh = letterbox(img, new_shape=(640, 640), auto=False)
@@ -52,16 +54,30 @@ def process_image(image):
 
 
 def detect(im, img, names=None, colors=[255, 255, 255]):
-    model = torch.jit.load(r'G://code//pycharm//dectection//project//trafficSignDetection//yolo//weights//best.pt')
+    nameGTSDB = ['danger', 'mandatory', 'prohibitory']
+    model = torch.jit.load(
+        r'G://code//pycharm//dectection//project//trafficSignDetection//yolo//weights//best.pt'
+    )
     result = model(im)[0]
     result = non_max_suppression(result, 0.5, 0.65)[0]
     result[:, :4] = scale_coords(im.shape[2:], result[:, :4], img.shape)
-    print(result)
+    res = []
     for *xyxy, conf, cls in result:
         label = f'{names[int(cls)]} {conf:.2f}'
-        plot_one_box(xyxy, img, label=label, color=colors[int(cls)], line_thickness=3)
-
-    return img
+        plot_one_box(xyxy,
+                     img,
+                     label=label,
+                     color=colors[int(cls)],
+                     line_thickness=3)
+        if int(cls.item()) != '':
+            res.append({
+                'label':
+                nameGTSDB[int(cls.item())],
+                'confidence':
+                round(float(conf.item()), 3),
+                'location': [round(float(coord.item()), 3) for coord in xyxy]
+            })
+    return img, res
 
 
 def get_result(base64_string=None):
@@ -78,19 +94,18 @@ def get_result(base64_string=None):
     # 使用OpenCV将数组解码为图像
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
     im = process_image(image)
-    res = detect(im, image, names=names, colors=colors)
+    res, dataRes = detect(im, image, names=names, colors=colors)
     success, encoded_image = cv2.imencode('.jpg', res)
 
     if success:
         # 将编码后的图像数据转换为Base64字符串
         base64_image = base64.b64encode(encoded_image).decode('utf-8')
-        # print(base64_image)
-        return base64_image
+        return {'base64_image': base64_image, 'detection_info': dataRes}
     else:
-        print("无法编码图像")
         return 'error'
     # cv2.imshow('image', res)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
-# get_result()
 
+
+# get_result()
