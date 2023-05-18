@@ -30,7 +30,7 @@ const codeMessage: { [key: number]: string } = {
 // 创建一个Axios实例
 const instance: AxiosInstance = axios.create({
     baseURL: 'http://127.0.0.1:5000/', // 设置基础URL
-    timeout: 10000, // 请求超时时间
+    timeout: 30000, // 请求超时时间
     withCredentials: false,
 });
 

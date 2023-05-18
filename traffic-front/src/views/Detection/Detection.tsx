@@ -14,6 +14,9 @@ import {
     Upload,
     Modal,
     Image,
+    Row,
+    Col,
+    Slider,
 } from 'antd'
 import { InboxOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons'
 import type { RcFile, UploadProps } from 'antd/es/upload'
@@ -47,9 +50,8 @@ const Detection: React.FC = () => {
     const [previewOpen, setPreviewOpen] = useState(false)
     const [previewImage, setPreviewImage] = useState('')
     const [previewTitle, setPreviewTitle] = useState('交通标志检测')
-
     const handleCancel = () => setPreviewOpen(false)
-
+    // 预览
     const handlePreview = async (file: UploadFile) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj as RcFile)
@@ -57,25 +59,25 @@ const Detection: React.FC = () => {
 
         setPreviewImage(file.url || (file.preview as string))
         setPreviewOpen(true)
-        // setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1))
-    }
-    const [fileList, setFileList] = useState<UploadFile[]>([])
-    useEffect(() => {})
-    const handleChange: UploadProps['onChange'] = ({
-        file: newFile,
-        fileList: newFileList,
-        event: e,
-    }) => {
-        setFileList([])
-        if (newFile.status !== 'removed') {
-            setFileList((value) => [...value, ...newFileList])
-        }
-        if (newFile.percent == 100) {
-            getCurrentImages()
-        }
-        console.log(newFile)
+        setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1))
     }
 
+    const [fileList, setFileList] = useState<UploadFile[]>([])
+    const [tempFileList, setTempFileList] = useState<UploadFile[]>([])
+    //  上传状态改变时候的图片，需要调用三次
+    // const handleChange: UploadProps['onChange'] = ({
+    //     file: newFile,
+    //     fileList: newFileList,
+    //     event: e,
+    // }) => {
+    //     setFileList([])
+    //     if (newFile.status !== 'removed') {
+    //         setFileList((value) => [...value, ...newFileList])
+    //         setTempFileList([...newFileList])
+    //     }
+    // }
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
+        setFileList(newFileList)
     const uploadButton = (
         <div>
             <PlusOutlined />
@@ -83,60 +85,135 @@ const Detection: React.FC = () => {
         </div>
     )
 
-    // const beforeUpload = (file: UploadFile, fileLists: UploadFile[]) => {
-    //     setFileList((fileList) => [...fileList, file])
-    // }
     // 得到目前的图
-    const [currentImages, setCurrentImages] = useState<string[]>([]);
-
+    const [currentImages, setCurrentImages] = useState<string[]>([])
     const getCurrentImages = async () => {
         const cur = await Promise.all(
             fileList.map(async (item, index) => await getBase64(item.originFileObj as RcFile))
-        );
-        setCurrentImages(cur);
-    };
-    
-    const [detectionResults, setDetectionResults] = useState([])
-    const onFinish = async () => {
+        )
+        setCurrentImages(cur)
+    }
+    interface detectionImageResults {
+        img: string
+        detectionInfo?: Object[]
+        objectNum?: number
+    }
+
+    // 移除图片时候：
+    const handleRemove = (file: UploadFile) => {
+        setFileList((prevFileList) =>
+            prevFileList.filter((item) => {
+                return item.uid !== file.uid
+            })
+        )
+    }
+    useEffect(() => {
+        // console.log(fileList)
+        getCurrentImages()
+    }, [fileList])
+    // iou
+    const [inputValue, setInputValue] = useState(0)
+
+    const onSliderChange = (newValue: number | null) => {
+        setInputValue(newValue as number)
+    }
+    // conf
+    const [confInputValue, setConfInputValue] = useState(0)
+    const onSliderConfChange = (newValue: number | null) => {
+        setConfInputValue(newValue as number)
+    }
+
+    // 结果图片
+    const [detectionResults, setDetectionResults] = useState<detectionImageResults[]>([])
+    const onFinish = async (values: any) => {
+        console.log(values, inputValue, confInputValue)
+
         const sendImages = await Promise.all(
             fileList.map(async (item, index) => {
                 return {
                     image: await getBase64(item.originFileObj as RcFile),
                     name: item.uid,
+                    conf: confInputValue,
+                    iou: inputValue,
                 }
             })
         )
         const { data: res } = await uploadImages(sendImages)
-        console.log(res)
-        setDetectionResults(res.images)
+        setDetectionResults([...res.results])
     }
-
     return (
         <>
-            {' '}
             <Form
-                labelCol={{ span: 4 }}
-                wrapperCol={{ span: 8 }}
+                labelCol={{ span: 3 }}
+                wrapperCol={{ span: 6 }}
                 layout="horizontal"
                 onValuesChange={onFormLayoutChange}
                 onFinish={onFinish}
             >
-                <Form.Item label="Input">
-                    <Input />
-                </Form.Item>
-                <Form.Item label="Select">
+                {/* <Form.Item label="" wrapperCol={{ span: 24 }}>
+                    <Form.Item label="input" className=" inline-block">
+                        <Input placeholder="请"></Input>
+                    </Form.Item>
+                    <Form.Item label="input" className=" inline-block  ml-8">
+                        <Input placeholder="请"></Input>
+                    </Form.Item>
+                </Form.Item> */}
+                <Form.Item label="模型选择" name="modelSelect">
                     <Select>
-                        <Select.Option value="demo">Demo</Select.Option>
+                        <Select.Option value="yolov5">YOLOv5</Select.Option>
+                        <Select.Option value="yolov5sg">YOLOv5-SG</Select.Option>
+                        <Select.Option value="yolov7">YOLOv7</Select.Option>
                     </Select>
                 </Form.Item>
-
-                <Form.Item label="DatePicker">
-                    <DatePicker />
+                <Form.Item wrapperCol={{ span: 24 }} label="IoU阈值" name="iou">
+                    <Row>
+                        <Col span={20}>
+                            <Slider
+                                defaultValue = {0.25}
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                onChange={onSliderChange}
+                                value={typeof inputValue === 'number' ? inputValue : 0}
+                            />
+                        </Col>
+                        <Col span={4}>
+                            <InputNumber
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                style={{ margin: '0 16px' }}
+                                value={inputValue}
+                                onChange={onSliderChange}
+                            />
+                        </Col>
+                    </Row>
                 </Form.Item>
-                <Form.Item label="InputNumber">
-                    <InputNumber />
+                <Form.Item wrapperCol={{ span: 24 }} label="置信度阈值" name="conf">
+                    <Row>
+                        <Col span={20}>
+                            <Slider
+                                defaultValue={0.45}
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                onChange={onSliderConfChange}
+                                value={typeof confInputValue === 'number' ? confInputValue : 0}
+                            />
+                        </Col>
+                        <Col span={4}>
+                            <InputNumber
+                                min={0}
+                                max={1}
+                                step={0.01}
+                                style={{ margin: '0 16px' }}
+                                value={confInputValue}
+                                onChange={onSliderConfChange}
+                            />
+                        </Col>
+                    </Row>
                 </Form.Item>
-                <Form.Item label="Switch" valuePropName="checked">
+                <Form.Item label="保存记录" valuePropName="checked">
                     <Switch />
                 </Form.Item>
                 <Form.Item label="开始检测">
@@ -170,6 +247,8 @@ const Detection: React.FC = () => {
                             fileList={fileList}
                             onPreview={handlePreview}
                             onChange={handleChange}
+                            multiple={true}
+                            onRemove={handleRemove}
                             // beforeUpload={(file, fileList) => beforeUpload(file, fileList)}
                         >
                             {fileList.length >= 8 ? null : uploadButton}
@@ -187,11 +266,7 @@ const Detection: React.FC = () => {
                 <h1 className=" m-5 text-2xl">原始图片</h1>
                 <Image.PreviewGroup>
                     {currentImages.map((item, index) => (
-                        <Image
-                            key={index}
-                            style={{ width: '384px' }}
-                            src={item}
-                        ></Image>
+                        <Image key={index} style={{ width: '384px' }} src={item}></Image>
                     ))}
                 </Image.PreviewGroup>
             </Card>
@@ -199,7 +274,7 @@ const Detection: React.FC = () => {
             <Card>
                 <Image.PreviewGroup>
                     {detectionResults.map((item, index) => (
-                        <Image key={index} style={{ width: '384px' }} src={item}></Image>
+                        <Image key={index} style={{ width: '384px' }} src={item.img}></Image>
                     ))}
                 </Image.PreviewGroup>
             </Card>
