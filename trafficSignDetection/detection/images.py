@@ -19,12 +19,13 @@ def upload_file():
 @app.route('/getImages', methods=['POST'])
 def detect_image():
     images = list(request.get_json())
+    #  添加到图片
     image_data = []
+    # 添加到种类
+    category_data = []
     res = []
     for item in images:
         print(item['conf'], item['iou'])
-        # curImage = base64.b64decode(item['image'])
-        # image_data.append({'filename': filename, 'data': curImage})
         # 检测
         detection_result = get_result(base64_string=item['image'][23:])
         if detection_result['detection_info'] != []:
@@ -43,18 +44,33 @@ def detect_image():
                 'objectNum':
                 0
             })
+        #  对检测完的图像进行编码
+        encoded_data = 'data:image/jpeg;base64,' + detection_result[
+            'base64_image']
         image_data.append({
-            'filename':
+            'name':
             item['name'],
             'currentImage':
-            base64.decode(item['image']),
+            base64.b64decode(item['image']),
             'resultImage':
-            base64.decode('data:image/jpeg;base64,' +
-                          detection_result['base64_image']),
+            base64.b64decode(encoded_data.encode('utf-8')),
+            'confidence':
+            item['conf'],
+            'iou':
+            item['iou'],
+            'category_id':
+            item['image']
         })
+        for i in detection_result['detection_info']:
+            category_data.append({
+                'category_id': item['name'],
+                'label': i.label
+            })
+
     # 存储到数据库
-    # db.session.bulk_insert_mappings(Image, image_data)
-    # db.session.commit()
+    db.session.bulk_insert_mappings(Detection_image, image_data)
+    db.session.bulk_insert_mappings(Category, category_data)
+    db.session.commit()
     # print(images)
     # image_data = base64.b64decode(images)
     # print(detection_result)

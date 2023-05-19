@@ -110,9 +110,8 @@ class Detection_image(db.Model):
                             db.ForeignKey('categorys.category_id'))
     category = db.relationship('Category', backref='detection_images')
 
-
+# 存储检测类别
 class Category(db.Model):
     __tablename__ = 'categorys'
     category_id = db.Column(db.String(32), nullable=False, primary_key=True)
-    resultImage = db.Column(db.String(32), nullable=False)
-    confidence = db.Column(db.Float, nullable=False)
+    label = db.Column(db.String(32), nullable=False)
