@@ -1,5 +1,5 @@
 from database.connection import app,User
-from itsdangerous import TimedJSONWebSignatureSerializer
+from itsdangerous import TimedJSONWebSignatureSerializer,SignatureExpired
 from flask import request, jsonify
 from io import BytesIO
 from random import randint
@@ -75,5 +75,11 @@ def login():
         # 用户名或密码错误，返回错误信息
         return jsonify({'error': 'Invalid username or password'})
 
-
-
+# 判断token是否过期
+def is_token_expired(token, secret_key='traffic', expiration_time=3600):
+    try:
+        s = TimedJSONWebSignatureSerializer(secret_key, expires_in=expiration_time)
+        data = s.loads(token)
+        return False  # Token未过期
+    except SignatureExpired:
+        return True  # Token已过期

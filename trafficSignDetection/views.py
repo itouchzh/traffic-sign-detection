@@ -1,11 +1,16 @@
 from database.connection import *
 from flask import jsonify, request
 from sqlalchemy import desc
+from utils.token import is_token_expired
 
 
 # 在路由函数中查询用户，并返回 JSON 格式数据
 @app.route('/user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
+    token = request.get_json('token')
+    # if is_token_expired(token):
+    
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'})

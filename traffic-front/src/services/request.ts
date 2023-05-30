@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { message, notification } from "antd";
+import { getLocalStorage } from './storage';
 // 定义接口返回类型
 interface ResponseData {
     code: number;
@@ -37,7 +38,10 @@ const instance: AxiosInstance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-
+        const token = getLocalStorage('token')
+        if (token) {
+            config.headers['Authorization'] = 'token'
+        }
         // 在发送请求之前做些什么
         return config;
     },
