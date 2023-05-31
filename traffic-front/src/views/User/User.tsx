@@ -11,17 +11,11 @@ import {
     Switch,
     Card,
     message,
-    Pagination
+    Pagination,
 } from 'antd'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
-import {
-    addOneUser,
-    getAllUsers,
-    editUserById,
-    deleteUserById,
-    findUserById,
-} from '@/services/user'
+import { addOneUser, getAllUsers, editUserById, deleteUserById, findUserById } from '@/utils/user'
 interface DataType {
     id: string
     username: string
@@ -214,7 +208,7 @@ const App: React.FC = () => {
                     </Form.Item>
                 </Form>
             </Card>
-            
+
             <Table
                 columns={columns}
                 pagination={{

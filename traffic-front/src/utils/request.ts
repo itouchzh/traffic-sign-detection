@@ -38,9 +38,9 @@ const instance: AxiosInstance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = getLocalStorage('token')
+        const token = getLocalStorage<string>('token')
         if (token) {
-            config.headers['Authorization'] = 'token'
+            config.headers['Authorization'] = token
         }
         // 在发送请求之前做些什么
         return config;
@@ -74,7 +74,7 @@ instance.interceptors.response.use(
             
         } else if (!response) {
             notification.error({
-                description: "客户端异常或网络问题，请清除缓存！",
+                description: "请求失败，客户端异常或网络问题，请清除缓存！",
                 message: "状态异常",
             });
         }

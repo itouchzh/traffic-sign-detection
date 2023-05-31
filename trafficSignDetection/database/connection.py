@@ -100,18 +100,22 @@ class Image(db.Model):
 class Detection_image(db.Model):
     __tablename__ = 'detection_image'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(32), nullable=False)
-    currentImage = db.Column(db.LargeBinary, nullable=False)
-    resultImage = db.Column(db.LargeBinary, nullable=False)
+    image_name = db.Column(
+        db.String(32),
+        db.ForeignKey('categorys.image_name'),
+        nullable=False,
+    )
+    current_image = db.Column(db.LargeBinary, nullable=False)
+    result_image = db.Column(db.LargeBinary, nullable=False)
     confidence = db.Column(db.Float, nullable=False)
     iou = db.Column(db.Float, nullable=False)
     detection_time = db.Column(db.TIMESTAMP, default=datetime.utcnow)
-    category_id = db.Column(db.String(32),
-                            db.ForeignKey('categorys.category_id'))
+    category_id = db.Column(db.Integer)
     category = db.relationship('Category', backref='detection_images')
 
-# 存储检测类别
+
 class Category(db.Model):
     __tablename__ = 'categorys'
-    category_id = db.Column(db.String(32), nullable=False, primary_key=True)
+    category_id = db.Column(db.Integer, nullable=False, primary_key=True)
     label = db.Column(db.String(32), nullable=False)
+    image_name = db.Column(db.String(32), nullable=False)

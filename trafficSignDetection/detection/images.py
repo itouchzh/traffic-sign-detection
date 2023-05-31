@@ -48,28 +48,30 @@ def detect_image():
         encoded_data = 'data:image/jpeg;base64,' + detection_result[
             'base64_image']
         image_data.append({
-            'name':
+            'image_name':
             item['name'],
-            'currentImage':
+            'current_image':
             base64.b64decode(item['image']),
-            'resultImage':
+            'result_image':
             base64.b64decode(encoded_data.encode('utf-8')),
             'confidence':
             item['conf'],
             'iou':
             item['iou'],
             'category_id':
-            item['image']
+            item['name']
         })
         for i in detection_result['detection_info']:
+            print(i,item['name'])
             category_data.append({
-                'category_id': item['name'],
-                'label': i.label
+                'image_name': item['name'],
+                'label': i['label']
             })
-
+    
     # 存储到数据库
-    db.session.bulk_insert_mappings(Detection_image, image_data)
     db.session.bulk_insert_mappings(Category, category_data)
+    db.session.commit()
+    db.session.bulk_insert_mappings(Detection_image, image_data)
     db.session.commit()
     # print(images)
     # image_data = base64.b64decode(images)

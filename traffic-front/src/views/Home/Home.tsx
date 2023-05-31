@@ -13,7 +13,7 @@ import type { MenuProps } from 'antd'
 import { Breadcrumb, Layout, Menu, theme, Button, Dropdown, Space } from 'antd'
 import { SelectInfo } from 'rc-menu/lib/interface'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { clearLocalStorage } from '@/services/storage'
+import { clearLocalStorage } from '@/utils/storage'
 const { Header, Content, Footer, Sider } = Layout
 
 type MenuItem = Required<MenuProps>['items'][number]

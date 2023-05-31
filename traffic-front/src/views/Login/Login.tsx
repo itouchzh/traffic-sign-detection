@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { LockOutlined, UserOutlined, KeyOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Form, Input, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import { setLocalStorage } from '@/services/storage'
+import { setLocalStorage } from '@/utils/storage'
 import initLoginBg from './init'
 import './login.scss'
 
-import { getCaptcha, login } from '@/services/user'
+import { getCaptcha, login } from '@/utils/user'
 const Login: React.FC = () => {
     // 获取验证码：
     const [captcha, setCaptcha] = useState('')
@@ -39,7 +39,7 @@ const Login: React.FC = () => {
             // console.log(res.data.error);
             message.error(res.error)
             requesetCaptcha()
-            return 
+            return
         }
         setLocalStorage('token', res.token)
         navigate('/home')

@@ -76,10 +76,14 @@ def login():
         return jsonify({'error': 'Invalid username or password'})
 
 # 判断token是否过期
-def is_token_expired(token, secret_key='traffic', expiration_time=3600):
+def is_token_expired(request, secret_key='traffic', expiration_time=3600):
+    token = request.headers.get('Authorization')
+    # if is_token_expired(token):
+    #     return jsonify({'error': 'token错误'})
     try:
         s = TimedJSONWebSignatureSerializer(secret_key, expires_in=expiration_time)
         data = s.loads(token)
+        print('未过期')
         return False  # Token未过期
     except SignatureExpired:
         return True  # Token已过期

@@ -21,7 +21,7 @@ import {
 import { InboxOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons'
 import type { RcFile, UploadProps } from 'antd/es/upload'
 import type { UploadFile } from 'antd/es/upload/interface'
-import { uploadImages } from '@/services/upload'
+import { uploadImages } from '@/utils/upload'
 type SizeType = Parameters<typeof Form>[0]['size']
 
 const normFile = (e: any) => {
@@ -112,13 +112,13 @@ const Detection: React.FC = () => {
         getCurrentImages()
     }, [fileList])
     // iou
-    const [inputValue, setInputValue] = useState(0)
+    const [inputValue, setInputValue] = useState(0.25)
 
     const onSliderChange = (newValue: number | null) => {
         setInputValue(newValue as number)
     }
     // conf
-    const [confInputValue, setConfInputValue] = useState(0)
+    const [confInputValue, setConfInputValue] = useState(0.45)
     const onSliderConfChange = (newValue: number | null) => {
         setConfInputValue(newValue as number)
     }
@@ -169,7 +169,7 @@ const Detection: React.FC = () => {
                     <Row>
                         <Col span={20}>
                             <Slider
-                                defaultValue = {0.25}
+                                defaultValue={inputValue}
                                 min={0}
                                 max={1}
                                 step={0.01}
@@ -193,7 +193,7 @@ const Detection: React.FC = () => {
                     <Row>
                         <Col span={20}>
                             <Slider
-                                defaultValue={0.45}
+                                defaultValue={confInputValue}
                                 min={0}
                                 max={1}
                                 step={0.01}
