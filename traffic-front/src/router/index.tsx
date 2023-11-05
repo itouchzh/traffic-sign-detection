@@ -11,6 +11,9 @@ const User = lazy(() => import('@/views/User/User'))
 const Detection = lazy(() => import('@/views/Detection/Detection'))
 const Results = lazy(() => import('@/views/Results/Results'))
 const ErrorPage = lazy(() => import('@/views/ErrorPage/Error'))
+const CommonButton = lazy(() => import('@/views/CommonCom/button/index'))
+const CommonWatermark = lazy(() => import('@/views/CommonCom/watermark/index'))
+const Paper = lazy(() => import('@/views/Paper'))
 
 // const Classes = lazy(() => import('@/views/Classes/Classes'))
 // const Detection = lazy(() => import('@/views/Detection/Detection/Detection'))
@@ -47,10 +50,32 @@ const routes = [
                 path: 'results',
                 element: suspense(<Results />),
             },
+            {
+                path: 'error',
+                element: suspense(<ErrorPage />),
+            },
+            {
+                path: 'paper',
+                element: suspense(<Paper />),
+            },
+            {
+                path: 'commonComponents',
+                // element: suspense(<CommonWatermark />),
+                children: [
+                    {
+                        path: 'button',
+                        element: suspense(<CommonButton />),
+                    },
+                    {
+                        path: 'watermark',
+                        element: suspense(<CommonWatermark />),
+                    },
+                ],
+            },
         ],
     },
     {
-        path: 'error',
+        path: '/*',
         element: suspense(<ErrorPage />),
     },
 ]

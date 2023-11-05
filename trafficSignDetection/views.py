@@ -15,6 +15,7 @@ def get_user(user_id):
         return jsonify({'error': 'User not found'})
     return jsonify(user.to_dict())
 
+
 # 查找所有用户
 @app.route('/getAllUsers')
 def get_all_users():
@@ -22,6 +23,27 @@ def get_all_users():
         return jsonify({'error': 'token错误'})
     users = User.query.all()
     return jsonify([user.serialize() for user in users])
+
+
+# 注册用户
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username, password = data['username'], data['password']
+    users = User.query.all()
+    for user in users:
+        if user.username == username:
+            return jsonify({
+                'status':200,
+                'error': '用户名字重复',
+            })
+    created_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user = User(username=username, password=password, created_at=created_at)
+
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'status': 200, 'message': '注册成功'})
+
 
 # 添加一个用户
 @app.route('/addOneUser', methods=['POST'])
@@ -32,7 +54,6 @@ def add_one_user():
     username = data.get('username', None)
     if not username:
         return {"error": '添加失败，用户名不能为空'}
-
     username, password, email, phone, car_number, address = data.get(
         'username'), data.get('password'), data.get('email'), data.get(
             'phone'), data.get('carNumber'), data.get('address')
@@ -49,6 +70,7 @@ def add_one_user():
     db.session.commit()
     last_user = User.query.order_by(desc(User.id)).first()
     return jsonify({'message': 'success', 'userInfo': last_user.serialize()})
+
 
 # 根据id修改用户
 @app.route('/changeUser/<int:id>', methods=['POST'])
@@ -68,11 +90,12 @@ def change_user(id):
 
     db.session.commit()
 
-    print(user)
+    # print(user)
     return jsonify({
         'message': f'修改用户-{user.username}成功',
         'userInfo': user.serialize()
     })
+
 
 # 根据id删除用户
 @app.route('/deteteUser/<int:id>', methods=['DELETE'])
@@ -86,6 +109,7 @@ def detele_user(id):
     db.session.commit()
     return jsonify({'message': '用户成功删除'})
 
+
 # 查找一个用户
 @app.route('/getOneUser', methods=['POST'])
 def find_user_by_id():
@@ -96,6 +120,7 @@ def find_user_by_id():
     if not user:
         return {'error': 'User not found'}
     return jsonify({'message': '查找成功', 'userInfo': user.serialize()})
+
 
 # 得到所有车辆信息
 @app.route('/getCar')

@@ -3,7 +3,7 @@ import request from './request'
 interface LoginParams<T> {
     username: T,
     password: T,
-    vercode: T
+    vercode?: T
 }
 
 interface user<T> {
@@ -22,9 +22,13 @@ export const getCaptcha = () => {
     const now = new Date()
     return request.get(`/getCaptcha?${now.getTime()}`)
 }
-
+// 登录
 export const login = (params: LoginParams<string>) => {
     return request.post('/login', params)
+}
+// 注册用户
+export const registerUser = (data: LoginParams<string>) => {
+    return request.post('/register', data)
 }
 
 

@@ -8,6 +8,7 @@ from flask_cors import CORS
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 CORS(app)
@@ -109,9 +110,24 @@ class Detection_image(db.Model):
     result_image = db.Column(db.LargeBinary, nullable=False)
     confidence = db.Column(db.Float, nullable=False)
     iou = db.Column(db.Float, nullable=False)
-    detection_time = db.Column(db.TIMESTAMP, default=datetime.utcnow)
+    model_name = db.Column(db.String, nullable=False)
+    detection_time = db.Column(db.TIMESTAMP,
+                               default=datetime.now(
+                                   pytz.timezone('Asia/Shanghai')))
     category_id = db.Column(db.Integer)
     category = db.relationship('Category', backref='detection_images')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'image_name': self.image_name,
+            'confidence': self.confidence,
+            'iou': self.iou,
+            'model_name': self.model_name,
+            'detection_time': self.detection_time,
+            'category_id': self.category_id,
+            # 'category': self.category
+        }
 
 
 class Category(db.Model):
@@ -119,3 +135,38 @@ class Category(db.Model):
     category_id = db.Column(db.Integer, nullable=False, primary_key=True)
     label = db.Column(db.String(32), nullable=False)
     image_name = db.Column(db.String(32), nullable=False)
+
+    def serialize(self):
+        return {
+            'category_id': self.category_id,
+            'label': self.label,
+            'image_name': self.image_name,
+        }
+
+
+class Detection(db.Model):
+    __tablename__ = 'detection'
+
+    id = db.Column(db.Integer, primary_key=True)
+    label = db.Column(db.String(255), nullable=False)
+    confidence = db.Column(db.Float, nullable=False)
+    location_x1 = db.Column(db.Float, nullable=False)
+    location_y1 = db.Column(db.Float, nullable=False)
+    location_x2 = db.Column(db.Float, nullable=False)
+    location_y2 = db.Column(db.Float, nullable=False)
+    image_name = db.Column(db.String(255), nullable=False)
+
+
+    def serialize(self):
+        return {
+            'id':
+            self.id,
+            'label':
+            self.label,
+            'confidence':
+            self.confidence,
+            'location': [
+                self.location_x1, self.location_y1, self.location_x2,
+                self.location_y2
+            ]
+        }

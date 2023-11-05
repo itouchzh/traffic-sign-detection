@@ -1,11 +1,13 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { message, notification } from "antd";
 import { getLocalStorage } from './storage';
+import { useNavigate } from 'react-router-dom';
 // 定义接口返回类型
 interface ResponseData {
     code: number;
     message: string;
     data: any;
+    error?: string
 }
 
 // 错误信息
@@ -57,6 +59,11 @@ instance.interceptors.response.use(
         // 对响应数据做些什么
         const { code, message, data } = response.data;
         if (response.status === 200) {
+            if (response.data?.error === 'token错误') {
+                console.log(window.location)
+                window.location.href = "/login";
+            }
+            // console.log(response)
             return response;
         } else {
             return Promise.reject(message);
@@ -71,7 +78,7 @@ instance.interceptors.response.use(
                 message: `请求错误 ${status}: ${config.url}`,
                 description: errorText,
             });
-            
+
         } else if (!response) {
             notification.error({
                 description: "请求失败，客户端异常或网络问题，请清除缓存！",

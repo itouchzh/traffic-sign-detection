@@ -22,6 +22,7 @@ import { InboxOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons'
 import type { RcFile, UploadProps } from 'antd/es/upload'
 import type { UploadFile } from 'antd/es/upload/interface'
 import { uploadImages } from '@/utils/upload'
+import { useForm } from 'antd/es/form/Form'
 type SizeType = Parameters<typeof Form>[0]['size']
 
 const normFile = (e: any) => {
@@ -40,7 +41,26 @@ const getBase64 = (file: RcFile): Promise<string> =>
         reader.onerror = (error) => reject(error)
     })
 
+const options = [
+    {
+        label: 'YOLOv5',
+        value: 'yolov5',
+    },
+    {
+        label: 'YOLO-SG',
+        value: 'yolosg',
+    },
+    {
+        label: 'YOLOv7',
+        value: 'yolov7',
+    },
+    {
+        label: 'EDN-YOLO',
+        value: 'ednyolo',
+    },
+]
 const Detection: React.FC = () => {
+    const [form] = useForm()
     const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default')
 
     const onFormLayoutChange = ({ size }: { size: SizeType }) => {
@@ -127,7 +147,7 @@ const Detection: React.FC = () => {
     const [detectionResults, setDetectionResults] = useState<detectionImageResults[]>([])
     const onFinish = async (values: any) => {
         console.log(values, inputValue, confInputValue)
-
+        console.log(form.getFieldsValue())
         const sendImages = await Promise.all(
             fileList.map(async (item, index) => {
                 return {
@@ -135,12 +155,15 @@ const Detection: React.FC = () => {
                     name: item.uid,
                     conf: confInputValue,
                     iou: inputValue,
+                    model_name: form.getFieldValue('modelSelect'),
+                    isSave: form.getFieldValue('save'),
                 }
             })
         )
         const { data: res } = await uploadImages(sendImages)
         setDetectionResults([...res.results])
     }
+    const handleSelectModel = () => {}
     return (
         <>
             <Form
@@ -149,6 +172,7 @@ const Detection: React.FC = () => {
                 layout="horizontal"
                 onValuesChange={onFormLayoutChange}
                 onFinish={onFinish}
+                form={form}
             >
                 {/* <Form.Item label="" wrapperCol={{ span: 24 }}>
                     <Form.Item label="input" className=" inline-block">
@@ -158,12 +182,8 @@ const Detection: React.FC = () => {
                         <Input placeholder="请"></Input>
                     </Form.Item>
                 </Form.Item> */}
-                <Form.Item label="模型选择" name="modelSelect">
-                    <Select>
-                        <Select.Option value="yolov5">YOLOv5</Select.Option>
-                        <Select.Option value="yolov5sg">YOLOv5-SG</Select.Option>
-                        <Select.Option value="yolov7">YOLOv7</Select.Option>
-                    </Select>
+                <Form.Item label="模型选择" name="modelSelect" initialValue="yolosg">
+                    <Select onChange={handleSelectModel} options={options}></Select>
                 </Form.Item>
                 <Form.Item wrapperCol={{ span: 24 }} label="IoU阈值" name="iou">
                     <Row>
@@ -213,7 +233,7 @@ const Detection: React.FC = () => {
                         </Col>
                     </Row>
                 </Form.Item>
-                <Form.Item label="保存记录" valuePropName="checked">
+                <Form.Item label="保存记录" valuePropName="checked" name="save" initialValue={true}>
                     <Switch />
                 </Form.Item>
                 <Form.Item label="开始检测">
@@ -241,6 +261,7 @@ const Detection: React.FC = () => {
                         </Upload>
                     </Form.Item> */}
                     <Form.Item>
+                        <h1 className="text-2xl mb-2">请上传图片</h1>
                         <Upload
                             action=""
                             listType="picture-card"
@@ -263,7 +284,9 @@ const Detection: React.FC = () => {
                         </Modal>
                     </Form.Item>
                 </Form>
-                <h1 className=" m-5 text-2xl">原始图片</h1>
+            </Card>
+            <h1 className=" m-5 text-2xl">原始图片</h1>
+            <Card>
                 <Image.PreviewGroup>
                     {currentImages.map((item, index) => (
                         <Image key={index} style={{ width: '384px' }} src={item}></Image>
