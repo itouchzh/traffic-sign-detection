@@ -1,0 +1,33 @@
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+#root,
+.App {
+    height: 100%;
+}
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+    width: 0;
+}
+
+/* 滚动时显示滚动条 */
+::-webkit-scrollbar {
+    width: 2px;
+    height: 5px;
+    /* 调整滚动条宽度 */
+}
+
+/* 定义滑块 内阴影+圆角 */
+::-webkit-scrollbar-thumb {
+    background: #b8d3f3;
+    border-radius: 10px;
+}
+
+/* 定义滚动条轨道 内阴影+圆角 */
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}

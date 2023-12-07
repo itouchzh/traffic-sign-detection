@@ -23,6 +23,7 @@ import type { RcFile, UploadProps } from 'antd/es/upload'
 import type { UploadFile } from 'antd/es/upload/interface'
 import { uploadImages } from '@/utils/upload'
 import { useForm } from 'antd/es/form/Form'
+import FButton from '@/components/FButton'
 type SizeType = Parameters<typeof Form>[0]['size']
 
 const normFile = (e: any) => {
@@ -301,6 +302,7 @@ const Detection: React.FC = () => {
                     ))}
                 </Image.PreviewGroup>
             </Card>
+            <FButton></FButton>
         </>
     )
 }

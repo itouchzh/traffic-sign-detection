@@ -20,3 +20,11 @@ def get_detections_results():
                   for all_detection_image in all_detection_images
               ]]
     return jsonify(result)
+
+
+@app.route('/getDetectionConf', methods=['GTE'])
+def get_detection_conf():
+    if is_token_expired(request):
+        return jsonify({'error': 'token错误'})
+    all_detections = Detection.query.all()
+    return jsonify([detection.serialize() for detection in all_detections])

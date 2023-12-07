@@ -170,3 +170,19 @@ class Detection(db.Model):
                 self.location_y2
             ]
         }
+    
+class Papers(db.Model):
+    __tablename__ = 'papers'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100))
+    content = db.Column(db.LargeBinary)
+    def serialize(self):
+            return {
+                'id': self.id,
+                'title': self.title,
+                'content': self.content,  # 将二进制数据解码为字符串
+            }
+
+
+    

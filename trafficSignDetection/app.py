@@ -2,6 +2,7 @@ from flask import Flask
 from views import *
 from detection.images import *
 from detection.results import *
+from detection.paper import *
 from database.connection import app
 from utils.token import login, get_captcha
 
@@ -23,9 +24,12 @@ app.route('/getImages')(detect_image)
 
 # 结果
 app.route('/getDetections')(get_detections_results)
-
+app.route('/getDetectionConf')(get_detection_conf)
 
 app.route('/test')(test)
 app.route('/getCar')(get_all_car)
+
+# pdf
+app.route('/get_pdf')(get_pdf)
 if __name__ == '__main__':
     app.run(use_reloader=True)

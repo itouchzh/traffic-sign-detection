@@ -14,12 +14,15 @@ const ErrorPage = lazy(() => import('@/views/ErrorPage/Error'))
 const CommonButton = lazy(() => import('@/views/CommonCom/button/index'))
 const CommonWatermark = lazy(() => import('@/views/CommonCom/watermark/index'))
 const Paper = lazy(() => import('@/views/Paper'))
+const FormDesignPage = lazy(() => import('@/views/CommonCom/formDesign'))
 
 // const Classes = lazy(() => import('@/views/Classes/Classes'))
 // const Detection = lazy(() => import('@/views/Detection/Detection/Detection'))
 // const Results = lazy(() => import('@/views/Detection/Results/Restults'))
 
-const suspense = (comp: JSX.Element) => <Suspense fallback={<Loading />}>{comp}</Suspense>
+const suspense = (comp: JSX.Element) => (
+    <Suspense fallback={<Loading />}>{comp}</Suspense>
+)
 
 const routes = [
     {
@@ -69,6 +72,10 @@ const routes = [
                     {
                         path: 'watermark',
                         element: suspense(<CommonWatermark />),
+                    },
+                    {
+                        path: 'formDesign',
+                        element: suspense(<FormDesignPage />),
                     },
                 ],
             },

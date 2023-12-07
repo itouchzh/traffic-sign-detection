@@ -4,7 +4,7 @@ export default function initLoginBg() {
     // var windowWidth = window.clientWidth;
     // var windowHeight = window.clientHeight;
     var canvas = document.getElementById('canvas') as HTMLCanvasElement,
-        ctx = canvas.getContext('2d') as CanvasRenderingContext2D,
+        ctx = canvas?.getContext('2d') as CanvasRenderingContext2D,
         w = (canvas.width = windowWidth),
         h = (canvas.height = windowHeight),
         hue = 217,
@@ -13,7 +13,7 @@ export default function initLoginBg() {
         maxStars = 500 //星星数量
 
     var canvas2 = document.createElement('canvas'),
-        ctx2 = canvas2.getContext('2d') as CanvasRenderingContext2D
+        ctx2 = canvas2?.getContext('2d') as CanvasRenderingContext2D
     canvas2.width = 100
     canvas2.height = 100
     var half = canvas2.width / 2,

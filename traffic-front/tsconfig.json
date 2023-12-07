@@ -18,7 +18,8 @@
         "baseUrl": "./",
         "paths": {
             "@/*": ["src/*"]
-        }
+        },
+        "types": ["node", "webpack-env"]
     },
-    "include": ["src"]
+    "include": ["src", "global.d.ts"]
 }

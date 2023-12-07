@@ -1,0 +1,37 @@
+$primary-color: #1890ff;
+.sortable-ghost {
+    min-height: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    // padding: 0 !important;
+    padding-left: 10px;
+    position: relative;
+    background: #fff;
+    &::before {
+        content: '';
+        height: 5px;
+        width: 100%;
+        background: $primary-color;
+        position: absolute;
+        top: 0;
+        right: 0;
+        transition: 0.3s;
+    }
+}
+
+.component-property-form {
+    :global {
+        .ant-form-item {
+            margin-bottom: 15px;
+        }
+    }
+}
+
+.component-tab {
+    :global {
+        .ant-tabs-nav-wrap {
+            height: 40px;
+        }
+    }
+}

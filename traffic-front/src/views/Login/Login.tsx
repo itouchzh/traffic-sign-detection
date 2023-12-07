@@ -4,7 +4,7 @@ import { Button, Checkbox, Form, Input, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { setLocalStorage } from '@/utils/storage'
 import initLoginBg from './init'
-import './login.scss'
+import './login.css'
 
 import { getCaptcha, login } from '@/utils/user'
 import RegisterModal from './components/RegisterModal'

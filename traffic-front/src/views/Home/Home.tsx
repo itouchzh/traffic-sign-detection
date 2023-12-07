@@ -7,7 +7,7 @@ import {
     DownOutlined,
     UserOutlined,
     BarChartOutlined,
-    FilePdfOutlined
+    FilePdfOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Breadcrumb, Layout, Menu, theme, Button, Dropdown, Space } from 'antd'
@@ -42,6 +42,11 @@ const siderMenuItems: MenuItem[] = [
     getItem('常用组件', '/home/commonComponents', <UserOutlined />, [
         getItem('按钮', '/home/commonComponents/button', <UserOutlined />),
         getItem('水印', '/home/commonComponents/watermark', <UserOutlined />),
+        getItem(
+            '表单设计器',
+            '/home/commonComponents/formDesign',
+            <UserOutlined />
+        ),
     ]),
 ]
 
@@ -116,8 +121,18 @@ const Home: React.FC = () => {
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
-            <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
+            <Sider
+                collapsible
+                collapsed={collapsed}
+                onCollapse={(value) => setCollapsed(value)}
+            >
+                <div
+                    style={{
+                        height: 32,
+                        margin: 16,
+                        background: 'rgba(255, 255, 255, 0.2)',
+                    }}
+                />
                 <Menu
                     theme="dark"
                     defaultSelectedKeys={[location.pathname]}
@@ -132,7 +147,13 @@ const Home: React.FC = () => {
                 <Header style={{ padding: 0, background: colorBgContainer }}>
                     <Button
                         type="text"
-                        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                        icon={
+                            collapsed ? (
+                                <MenuUnfoldOutlined />
+                            ) : (
+                                <MenuFoldOutlined />
+                            )
+                        }
                         onClick={() => setCollapsed(!collapsed)}
                         className="h-16 w-16 text-base"
                     />
@@ -162,7 +183,13 @@ const Home: React.FC = () => {
                             },
                         ]}
                     ></Breadcrumb>
-                    <div style={{ padding: 24, minHeight: '90%', background: colorBgContainer }}>
+                    <div
+                        style={{
+                            padding: 24,
+                            height: '95%',
+                            background: colorBgContainer,
+                        }}
+                    >
                         <Outlet />
                     </div>
                 </Content>
