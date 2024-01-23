@@ -1,17 +1,16 @@
 import { Modal } from 'antd'
 import React, { useEffect, useImperativeHandle, useState } from 'react'
 import FormBuild from './FormBuild'
+import { IData, IRecord } from './interface'
 
-interface PreviewProps {
+export interface PreviewProps {
     className?: string
-    data?: any
+    data?: IData
+    onChange?: (value: IRecord[], key?: string) => void
 }
-const Preview = ({ className, data }: PreviewProps, ref: any) => {
+
+const Preview = ({ className, data, onChange }: PreviewProps, ref: any) => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    const [jsonData, setJsonData] = useState<any>(null)
-    useEffect(() => {
-        setJsonData(data)
-    }, [data])
     const changeModalState = () => {
         setIsModalOpen(!isModalOpen)
     }
@@ -23,6 +22,7 @@ const Preview = ({ className, data }: PreviewProps, ref: any) => {
     const handleCancel = () => {
         setIsModalOpen(false)
     }
+
     useImperativeHandle(ref, () => {
         return {
             changeModalState,
@@ -41,7 +41,7 @@ const Preview = ({ className, data }: PreviewProps, ref: any) => {
                 width={850}
                 className=" m-auto"
             >
-                <FormBuild value={jsonData} className="p-5" />
+                <FormBuild data={data} className="p-5" onChange={onChange} />
             </Modal>
         </div>
     )

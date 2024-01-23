@@ -38,9 +38,9 @@ db = SQLAlchemy(app)
 
 
 # 数据库模型类
-class User(db.Model):
+class Users(db.Model):
     # 定义表名字
-    __tablename__ = 'user'
+    __tablename__ = 'users'
     # 定义字段名字，db.column表示字段，指明类型
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), unique=True)
@@ -52,6 +52,8 @@ class User(db.Model):
     address = db.Column(db.String(32), unique=False)
     car_number = db.Column(db.String(32), unique=True)
     car_id = db.Column(db.String(32), unique=True)
+    menus = db.relationship('Menus', backref='user', lazy=True)
+    # role = db.Column(db.String(32))
 
     # 返回值 字符串
     def __repr__(self):
@@ -62,14 +64,40 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            # 'password': self.password,
             'email': self.email,
             'phone': self.phone,
             'createdAt': self.created_at,
             'address': self.address,
             'carNumber': self.car_number,
-            'carId': self.car_id
+            'carId': self.car_id,
+            'menus': [menu.serialize() for menu in self.menus]  # 关联的菜单信息
         }
+    
+
+
+
+class Menus(db.Model):
+    __tablename__ = 'menus'
+
+    menu_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(255), nullable=False)
+    path = db.Column(db.String(255), nullable=False)
+    icon = db.Column(db.String(255))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return f"<Menus(menu_id={self.menu_id}, title={self.title}, path={self.path}, icon={self.icon}, user_id={self.user_id})>"
+    
+    def serialize(self):
+        return {
+            'menuId': self.menu_id,
+            'title': self.title,
+            'path': self.path,
+            'icon': self.icon,
+            'userId': self.user_id
+        }
+
+
 
 
 # 创建第二个表

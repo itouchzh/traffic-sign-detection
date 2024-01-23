@@ -122,3 +122,44 @@ def get_result(model, base64_string=None):
 
 
 # get_result()
+    
+def get_video_result(model, video_path):
+    names = ['danger', 'mandatory', 'prohibitory']
+    colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
+    
+
+
+def detect_frame(frame, model_name, names=None, colors=[255, 255, 255]):
+    nameGTSDB = ['danger', 'mandatory', 'prohibitory']
+    model_dict = {
+        'yolosg':
+        r'G://code//pycharm//dectection//project//trafficSignDetection//yolo//weights//best.pt',
+        'yolov5':
+        r'G://code//pycharm//dectection//project//trafficSignDetection//yolo//weights//yolov5s.pt',
+        'ednyolo':
+        r'G://code//pycharm//dectection//project//trafficSignDetection//yolo//weights//endyolo.pt',
+        'yolov7':
+        r'G://code//pycharm//dectection//project//trafficSignDetection//yolo//weights//yolov7.pt',
+    }
+    model = torch.jit.load(model_dict[model_name])
+    result = model(im)[0]
+    result = non_max_suppression(result, 0.5, 0.65)[0]
+    result[:, :4] = scale_coords(im.shape[2:], result[:, :4], img.shape)
+    res = []
+    for *xyxy, conf, cls in result:
+        label = f'{names[int(cls)]} {conf:.2f}'
+        plot_one_box(xyxy,
+                     img,
+                     label=label,
+                     color=colors[int(cls)],
+                     line_thickness=3)
+        if int(cls.item()) != '':
+            res.append({
+                'label':
+                nameGTSDB[int(cls.item())],
+                'confidence':
+                round(float(conf.item()), 3),
+                'location': [round(float(coord.item()), 3) for coord in xyxy]
+            })
+
+    return img, res

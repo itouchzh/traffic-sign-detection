@@ -1,12 +1,13 @@
-/**
- *
- */
-interface IConfig {
+import { CSSProperties, ReactNode } from 'react'
+
+export interface IConfig {
     layout?: string
     labelCol?: any
     wrapperCol?: any
     required?: boolean
-    customStyle?: string
+    customStyle?: CSSProperties
+    size?: string
+    disabled?: boolean
     [key: string]: any
 }
 
@@ -33,11 +34,11 @@ export interface IRecordOptions {
     picker?: string
     count?: number
     allowHalf?: boolean
-    defaultValue?: any
+    defaultValue?: Array<string> | string | number
     action?: string
     listType?: string
     accept?: string
-    headers?: any
+    headers?: ReactNode | string
     name?: string
     multiple?: boolean
     alertType?: string
@@ -62,7 +63,7 @@ export interface IRecord {
     [key: string]: any
 }
 
-export type TRecord = Required<Pick<IRecord, 'options'>> & Partial<IRecord>;
+export type TRecord = Required<Pick<IRecord, 'options'>> & Partial<IRecord>
 
 export interface IData {
     list: TRecord[]

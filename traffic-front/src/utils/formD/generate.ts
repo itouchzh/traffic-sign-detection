@@ -1,6 +1,6 @@
 // 通过json数据生成表单
 
-import { IRecordOptions } from "@/components/FormDesign/components"
+import { IRecordOptions } from '@/components/FormDesign/components'
 
 /**
  * @param config form config
@@ -23,7 +23,6 @@ const generateFormFooterButtons = (config: any) => {
     </Form.Item>`
     return str
 }
-
 
 export interface IRecord {
     label: string
@@ -53,21 +52,15 @@ interface Tags {
     html: (record: IRecord) => string
     treeSelect: (record: IRecord) => string
     cascader: (record: IRecord) => string
+    grid: (record: IRecord) => string
+    card: (record: IRecord) => string
+    table: (record: IRecord) => string
     [key: string]: (record: IRecord) => string
 }
 
 const tags: Tags = {
     input(record) {
-        const {
-            bordered,
-            disabled,
-            placeholder,
-            allowClear,
-            maxLength,
-            type,
-            value,
-            size,
-        } = record.options
+        const { bordered, disabled, placeholder, allowClear, maxLength, type, value, size } = record.options
         return `
             <Form.Item label="${record.label}" name="${record.key}" initialValue="${value}">
                 <Input
@@ -82,16 +75,7 @@ const tags: Tags = {
             </Form.Item>`
     },
     textarea(record) {
-        const {
-            rows,
-            maxLength,
-            clearable,
-            bordered,
-            disabled,
-            placeholder,
-            value,
-            hidden,
-        } = record.options
+        const { rows, maxLength, clearable, bordered, disabled, placeholder, value, hidden } = record.options
         return `
             <Form.Item label="${record.label}" name="${record.key}" initialValue="${value}" hidden={${hidden}}>
                 <Input.TextArea
@@ -105,22 +89,10 @@ const tags: Tags = {
             </Form.Item>`
     },
     select(record) {
-        const {
-            option,
-            bordered,
-            disabled,
-            clearable,
-            placeholder,
-            showSearch,
-            size,
-            mode,
-            value,
-        } = record.options
+        const { option, bordered, disabled, clearable, placeholder, showSearch, size, mode, value } = record.options
         let realMode = mode ? `mode="${mode}"` : 'mode={undefined}'
         return `
-            <Form.Item label="${record.label}" name="${
-            record.key
-        }" initialValue={${value}}>
+            <Form.Item label="${record.label}" name="${record.key}" initialValue={${value}}>
                 <Select
                     options={${JSON.stringify(option)}}
                     bordered={${bordered}}
@@ -147,23 +119,15 @@ const tags: Tags = {
     checkbox(record) {
         const { value, option, disabled } = record.options
         return `
-            <Form.Item label="${record.label}" name="${
-            record.key
-        }" initialValue={${JSON.stringify(value)}}>
-                <Checkbox.Group options={${JSON.stringify(
-                    option
-                )}} disabled={${disabled}}/>
+            <Form.Item label="${record.label}" name="${record.key}" initialValue={${JSON.stringify(value)}}>
+                <Checkbox.Group options={${JSON.stringify(option)}} disabled={${disabled}}/>
             </Form.Item>`
     },
     radio(record) {
         const { value, option, disabled, hidden } = record.options
         return `
-            <Form.Item label="${record.label}" name="${
-            record.key
-        }" hidden={${hidden}} initialValue="${value}">
-                <Radio.Group options={${JSON.stringify(
-                    option
-                )}} disabled={${disabled}}/>
+            <Form.Item label="${record.label}" name="${record.key}" hidden={${hidden}} initialValue="${value}">
+                <Radio.Group options={${JSON.stringify(option)}} disabled={${disabled}}/>
             </Form.Item>`
     },
     date(record) {
@@ -214,21 +178,10 @@ const tags: Tags = {
             </Form.Item>`
     },
     treeSelect(record) {
-        const {
-            data,
-            value,
-            disabled,
-            hidden,
-            allowClear,
-            treeCheckable,
-            treeDefaultExpandAll,
-            multiple,
-            showSearch,
-        } = record.options
+        const { data, value, disabled, hidden, allowClear, treeCheckable, treeDefaultExpandAll, multiple, showSearch } =
+            record.options
         return `
-            <Form.Item label="${record.label}" name="${
-            record.key
-        }" hidden={${hidden}} initialValue={${value}}>
+            <Form.Item label="${record.label}" name="${record.key}" hidden={${hidden}} initialValue={${value}}>
                 <TreeSelect
                     treeData={${JSON.stringify(data)}}
                     disabled={${disabled}}
@@ -243,9 +196,7 @@ const tags: Tags = {
     cascader(record) {
         const { data, value, disabled, hidden, clearable } = record.options
         return `
-            <Form.Item label="${record.label}" name="${
-            record.key
-        }" hidden={${hidden}} initialValue={${value}}>
+            <Form.Item label="${record.label}" name="${record.key}" hidden={${hidden}} initialValue={${value}}>
                 <Cascader
                     options={${JSON.stringify(data)}}
                     disabled={${disabled}}
@@ -261,8 +212,7 @@ const tags: Tags = {
             </Form.Item>`
     },
     uploadFile(record) {
-        const { action, listType, headers, multiple, name, accept } =
-            record.options
+        const { action, listType, headers, multiple, name, accept } = record.options
         return `
             <Form.Item label="${record.label}" name="${record.key}">
                 <Upload
@@ -295,29 +245,59 @@ const tags: Tags = {
                 <div dangerouslySetInnerHTML={{ __html: ${value} }} />
             </Form.Item>`
     },
+    grid(record) {
+        const { columns } = record
+        return `
+        <Row gutter={${record.options.gutter}}>
+        ${columns.map((colItem: any) => {
+            return `<Col span={${colItem.span}}>${colItem.list
+                .map((item: IRecord) => tags[item.type](item))
+                .join('')}</Col>`
+        })}
+        </Row>`
+    },
+    card(record) {
+        return `
+        <Card title="${record.title}">
+        ${record.list.map((item: IRecord) => tags[item.type](item)).join('')}
+        </Card>`
+    },
+    table(record) {
+        return `<h1>`
+    },
 }
 
-export const generateReactTSXCode = (data: {
-    list: IRecord[]
-    config: any
-}) => {
+export const generateReactTSXCode = (data: { list: IRecord[]; config: any }) => {
     const { list, config } = data
     let formItems: string = ''
     let importArr: string[] = []
+    const searchItemToImport = (arr: IRecord[]) => {
+        arr.forEach((item: IRecord) => {
+            if (IMPORT_DICT[item.type]) {
+                importArr.push(IMPORT_DICT[item.type])
+            }
+            if (item.type === 'grid') {
+                item.columns.forEach((col: any) => {
+                    searchItemToImport(col.list)
+                })
+            }
+            if (item.type === 'card') {
+                searchItemToImport(item.list)
+            }
+        })
+    }
+    searchItemToImport(list)
     list.forEach((item) => {
-        if (IMPORT_DICT[item.type]) {
-            importArr.push(IMPORT_DICT[item.type])
-        }
-        formItems += tags[item.type](item) + '\n'
+        formItems += tags[item.type](item)
     })
     const importStr = Array.from(new Set(importArr)).join(',')
-    // generate button
+    // generate buttonchuxian1
     const footer = generateFormFooterButtons(config)
     // generate from
     const form = generateForm(config, formItems + footer)
 
     return `import React,{useState,useEffect} from 'react'
-    import {Form,${importStr}} from 'antd'
+    import {Form, Space, Button, ${importStr}} from 'antd'
     interface IProps{}
     const App:React.FC<IProps> = ({}:IProps) => {
         const [form] = Form.useForm()
@@ -369,4 +349,7 @@ const IMPORT_DICT: ImportDict = {
     uploadFile: 'Upload',
     alert: 'Alert',
     divider: 'Divider',
+    gird: 'Row, Col',
+    radio: 'Radio',
+    card: 'Card',
 }

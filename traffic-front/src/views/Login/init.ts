@@ -1,12 +1,10 @@
 export default function initLoginBg() {
     var windowWidth = document.documentElement.clientWidth || document.body.clientWidth
     var windowHeight = document.documentElement.clientHeight || document.body.clientHeight
-    // var windowWidth = window.clientWidth;
-    // var windowHeight = window.clientHeight;
     var canvas = document.getElementById('canvas') as HTMLCanvasElement,
         ctx = canvas?.getContext('2d') as CanvasRenderingContext2D,
-        w = (canvas.width = windowWidth),
-        h = (canvas.height = windowHeight),
+        w = (canvas.width = windowWidth) || 0,
+        h = (canvas.height = windowHeight) || 0,
         hue = 217,
         stars: IntStart[] = [],
         count = 0,

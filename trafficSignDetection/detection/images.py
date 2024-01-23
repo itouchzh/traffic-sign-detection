@@ -9,7 +9,6 @@ import base64
 @app.route('/uploadFile', methods=['POST'])
 def upload_file():
     file = request.files['file']
-    # print(file)
     if file:
         # 处理文件
         return '文件上传成功'

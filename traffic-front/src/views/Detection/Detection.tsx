@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
     Button,
     Cascader,
@@ -17,6 +17,7 @@ import {
     Row,
     Col,
     Slider,
+    message,
 } from 'antd'
 import { InboxOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons'
 import type { RcFile, UploadProps } from 'antd/es/upload'
@@ -24,6 +25,7 @@ import type { UploadFile } from 'antd/es/upload/interface'
 import { uploadImages } from '@/utils/upload'
 import { useForm } from 'antd/es/form/Form'
 import FButton from '@/components/FButton'
+import { useAuthContext } from '@/context/authContext'
 type SizeType = Parameters<typeof Form>[0]['size']
 
 const normFile = (e: any) => {
@@ -63,7 +65,9 @@ const options = [
 const Detection: React.FC = () => {
     const [form] = useForm()
     const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default')
-
+    // const { role } = useAuthContext()
+    const role = 'admin'
+    const permission = useRef<boolean>(role === 'admin' ? true : false)
     const onFormLayoutChange = ({ size }: { size: SizeType }) => {
         setComponentSize(size)
     }
@@ -84,7 +88,6 @@ const Detection: React.FC = () => {
     }
 
     const [fileList, setFileList] = useState<UploadFile[]>([])
-    const [tempFileList, setTempFileList] = useState<UploadFile[]>([])
     //  上传状态改变时候的图片，需要调用三次
     // const handleChange: UploadProps['onChange'] = ({
     //     file: newFile,
@@ -97,8 +100,7 @@ const Detection: React.FC = () => {
     //         setTempFileList([...newFileList])
     //     }
     // }
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
-        setFileList(newFileList)
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => setFileList(newFileList)
     const uploadButton = (
         <div>
             <PlusOutlined />
@@ -186,9 +188,9 @@ const Detection: React.FC = () => {
                 <Form.Item label="模型选择" name="modelSelect" initialValue="yolosg">
                     <Select onChange={handleSelectModel} options={options}></Select>
                 </Form.Item>
-                <Form.Item wrapperCol={{ span: 24 }} label="IoU阈值" name="iou">
+                <Form.Item wrapperCol={{ span: 12 }} label="IoU阈值" name="iou">
                     <Row>
-                        <Col span={20}>
+                        <Col span={12}>
                             <Slider
                                 defaultValue={inputValue}
                                 min={0}
@@ -210,9 +212,9 @@ const Detection: React.FC = () => {
                         </Col>
                     </Row>
                 </Form.Item>
-                <Form.Item wrapperCol={{ span: 24 }} label="置信度阈值" name="conf">
+                <Form.Item wrapperCol={{ span: 12 }} label="置信度阈值" name="conf">
                     <Row>
-                        <Col span={20}>
+                        <Col span={12}>
                             <Slider
                                 defaultValue={confInputValue}
                                 min={0}
@@ -241,6 +243,17 @@ const Detection: React.FC = () => {
                     <Button type="primary" htmlType="submit">
                         开始检测
                     </Button>
+                    {/* 测试权限管理按钮 */}
+                    {/* {permission.current && (
+                        <Button
+                            type="primary"
+                            onClick={() => {
+                                message.success('我有权限，谢谢！')
+                            }}
+                        >
+                            测试用户权限按钮
+                        </Button>
+                    )} */}
                 </Form.Item>
             </Form>
             <Card>
@@ -264,7 +277,7 @@ const Detection: React.FC = () => {
                     <Form.Item>
                         <h1 className="text-2xl mb-2">请上传图片</h1>
                         <Upload
-                            action=""
+                            action="http://localhost:5000/uploadFile"
                             listType="picture-card"
                             fileList={fileList}
                             onPreview={handlePreview}
@@ -275,12 +288,7 @@ const Detection: React.FC = () => {
                         >
                             {fileList.length >= 8 ? null : uploadButton}
                         </Upload>
-                        <Modal
-                            open={previewOpen}
-                            title={previewTitle}
-                            footer={null}
-                            onCancel={handleCancel}
-                        >
+                        <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
                             <img alt="example" style={{ width: '100%' }} src={previewImage} />
                         </Modal>
                     </Form.Item>
@@ -302,7 +310,7 @@ const Detection: React.FC = () => {
                     ))}
                 </Image.PreviewGroup>
             </Card>
-            <FButton></FButton>
+            <FButton />
         </>
     )
 }

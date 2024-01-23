@@ -1,5 +1,4 @@
 const path = require('path')
-const SpriteLoaderPlugin = require('svg-sprite-loader')
 
 module.exports = {
     // webpack 配置
@@ -10,34 +9,7 @@ module.exports = {
             '@': path.resolve(__dirname, 'src'),
         },
         module: {
-            rules: [
-                {
-                    test: /\.(png|jpe?g|gif|webp|svg|ico)$/,
-                    type: 'asset',
-                    // 静态资源处理排除svg icon所在的目录
-                    exclude: [path.resolve(__dirname, './src/assets/icons')],
-                    parser: {
-                        dataUrlCondition: {
-                            maxSize: 8 * 1024,
-                        },
-                    },
-                    generator: {
-                        filename: 'image/[name].[hash:8][ext]',
-                    },
-                },
-                {
-                    test: /\.svg$/, // 匹配SVG文件
-                    include: path.resolve(__dirname, './src/assets/icons'), // 包括的目录
-                    use: [
-                        {
-                            loader: 'svg-sprite-loader',
-                            options: {
-                                symbolId: 'svg-[name]',
-                            },
-                        },
-                    ],
-                },
-            ],
+            rules: [],
         },
         plugins: [
             // new SpriteLoaderPlugin({ plainSprite: true }), // 开启svg sprite功能
@@ -54,16 +26,5 @@ module.exports = {
         },
     },
 
-    // babel: {
-    //     presets: [
-    //         [
-    //             '@babel/preset-react',
-    //             {
-    //                 runtime: 'automatic',
-    //                 importSource: '@emotion/react',
-    //             },
-    //         ],
-    //     ],
-    //     plugins: ['@emotion'],
-    // },
+   
 }

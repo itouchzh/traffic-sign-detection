@@ -1,4 +1,116 @@
-export const basicsList = [
+// 布局组件
+export const layoutComponentList = [
+    {
+        type: 'divider',
+        label: '分割线',
+        icon: 'icon-divider',
+        options: {
+            width: '100%',
+            orientation: 'left',
+            dashed: false,
+            text: '分割线',
+        },
+        key: '',
+        model: '',
+    },
+    {
+        type: 'card',
+        label: '卡片布局',
+        title: '卡片',
+        icon: 'icon-kapian',
+        options: {},
+        list: [],
+        key: '',
+        model: '',
+    },
+    {
+        type: 'grid',
+        label: '栅格布局',
+        icon: 'icon-grid',
+        columns: [
+            {
+                span: 12,
+                list: [],
+            },
+            {
+                span: 12,
+                list: [],
+            },
+        ],
+        options: {
+            gutter: 0,
+        },
+        key: '',
+        model: '',
+    },
+    // {
+    //     type: 'collapse',
+    //     label: '折叠面板',
+    //     icon: '',
+    //     options: {
+    //         items: [
+    //             {
+    //                 key: '1',
+    //                 label: '折叠面板1',
+    //                 children: '折叠面板',
+    //             },
+    //         ],
+    //     },
+    //     key: '',
+    // },
+    // {
+    //     type: 'table',
+    //     label: '表格布局',
+    //     icon: 'icon-table',
+    //     trs: [
+    //         {
+    //             tds: [
+    //                 {
+    //                     colspan: 1,
+    //                     rowspan: 1,
+    //                     list: [],
+    //                 },
+    //                 {
+    //                     colspan: 1,
+    //                     rowspan: 1,
+    //                     list: [],
+    //                 },
+    //             ],
+    //         },
+    //         {
+    //             tds: [
+    //                 {
+    //                     colspan: 1,
+    //                     rowspan: 1,
+    //                     list: [],
+    //                 },
+    //                 {
+    //                     colspan: 1,
+    //                     rowspan: 1,
+    //                     list: [],
+    //                 },
+    //             ],
+    //         },
+    //     ],
+    //     options: {
+    //         width: '100%',
+    //         bordered: true,
+    //         bright: false,
+    //         small: true,
+    //         customStyle: '',
+    //     },
+    //     key: '',
+    //     model: '',
+    // },
+    // {
+    //     type: 'tab',
+    // },
+    // {
+    //     type: 'collapse',
+    // },
+]
+
+export const basicList = [
     {
         type: 'input', // 表单类型
         label: '输入框', // 标题文字
@@ -46,7 +158,7 @@ export const basicsList = [
             hidden: false, // 是否隐藏，false显示，true隐藏
             disabled: false,
             placeholder: '请输入多行文本',
-            bordered:true,
+            bordered: true,
         },
         key: '',
         rules: [
@@ -124,7 +236,7 @@ export const basicsList = [
             step: 1, // 步长，点击加减按钮时候，加减多少
             hidden: false, // 是否隐藏，false显示，true隐藏
             disabled: false, //是否禁用
-            placeholder: '请输入',
+            // placeholder: '请输入',
             size: 'default',
         },
         key: '',
@@ -605,14 +717,3 @@ export const basicsList = [
         key: '',
     },
 ]
-
-// trigger
-export const trigger = {
-    Input: 'blur',
-    InputNumber: 'blur',
-    Select: 'change',
-    RadioGroup: 'change',
-    CheckGroup: 'change',
-    Cascader: 'change',
-    Rate: 'change',
-}

@@ -4,6 +4,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    background: url('/src/assets/images/bg.jpg');
 }
 
 #normal_login {
@@ -12,6 +13,7 @@
     width: 430px;
     background-color: #fff;
     padding: 30px;
+    border-radius: 5px;
 }
 .title {
     font-size: 30px;
@@ -21,6 +23,7 @@
 }
 .login-form {
     max-width: 400px;
+    background-color: antiquewhite;
 }
 
 .login-form-forgot {

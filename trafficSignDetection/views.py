@@ -10,7 +10,7 @@ def get_user(user_id):
     if is_token_expired(request):
         return jsonify({'error': 'token错误'})
 
-    user = User.query.get(user_id)
+    user = Users.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'})
     return jsonify(user.to_dict())
@@ -21,7 +21,7 @@ def get_user(user_id):
 def get_all_users():
     if is_token_expired(request):
         return jsonify({'error': 'token错误'})
-    users = User.query.all()
+    users = Users.query.all()
     return jsonify([user.serialize() for user in users])
 
 
@@ -30,7 +30,7 @@ def get_all_users():
 def register():
     data = request.get_json()
     username, password = data['username'], data['password']
-    users = User.query.all()
+    users = Users.query.all()
     for user in users:
         if user.username == username:
             return jsonify({
@@ -38,7 +38,7 @@ def register():
                 'error': '用户名字重复',
             })
     created_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-    user = User(username=username, password=password, created_at=created_at)
+    user = Users(username=username, password=password, created_at=created_at)
 
     db.session.add(user)
     db.session.commit()
@@ -58,7 +58,7 @@ def add_one_user():
         'username'), data.get('password'), data.get('email'), data.get(
             'phone'), data.get('carNumber'), data.get('address')
     created_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-    user = User(username=username,
+    user = Users(username=username,
                 password=password,
                 email=email,
                 phone=phone,
@@ -68,7 +68,7 @@ def add_one_user():
 
     db.session.add(user)
     db.session.commit()
-    last_user = User.query.order_by(desc(User.id)).first()
+    last_user = Users.query.order_by(desc(Users.id)).first()
     return jsonify({'message': 'success', 'userInfo': last_user.serialize()})
 
 
@@ -77,7 +77,7 @@ def add_one_user():
 def change_user(id):
     if is_token_expired(request):
         return jsonify({'error': 'token错误'})
-    user = User.query.get(id)
+    user = Users.query.get(id)
     if not user:
         return {'error': 'User not found'}
     data = request.get_json()
@@ -102,7 +102,7 @@ def change_user(id):
 def detele_user(id):
     if is_token_expired(request):
         return jsonify({'error': 'token错误'})
-    user = User.query.get(id)
+    user = Users.query.get(id)
     if not user:
         return {'error': 'User not found'}
     db.session.delete(user)
@@ -116,7 +116,7 @@ def find_user_by_id():
     if is_token_expired(request):
         return jsonify({'error': 'token错误'})
     id = request.get_json('id')
-    user = User.query.get(id)
+    user = Users.query.get(id)
     if not user:
         return {'error': 'User not found'}
     return jsonify({'message': '查找成功', 'userInfo': user.serialize()})
@@ -134,5 +134,5 @@ def get_all_car():
 
 @app.route('/test', methods=['GET'])
 def test():
-    count = User.query.count()
+    count = Users.query.count()
     return jsonify({'count': count})

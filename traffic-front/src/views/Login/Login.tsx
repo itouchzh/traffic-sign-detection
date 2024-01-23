@@ -3,14 +3,20 @@ import { LockOutlined, UserOutlined, KeyOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Form, Input, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { setLocalStorage } from '@/utils/storage'
-import initLoginBg from './init'
+// import initLoginBg from './init'
 import './login.css'
 
-import { getCaptcha, login } from '@/utils/user'
+import { LoginParams, getCaptcha, login } from '@/utils/user'
 import RegisterModal from './components/RegisterModal'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/state/store'
+import { loginUser, setUser } from '@/state/user/userSlice'
+import { useAuthContext } from '@/context/authContext'
 const Login: React.FC = () => {
     // 获取验证码：
     const [captcha, setCaptcha] = useState('')
+    const dispatch = useDispatch<AppDispatch>()
+    // const { signin } = useAuthContext()
     const requesetCaptcha = async () => {
         const response = await getCaptcha()
         setCaptcha(response.data.captchaImg)
@@ -22,12 +28,9 @@ const Login: React.FC = () => {
         requesetCaptcha()
     }
     const navigate = useNavigate()
+
     // const [messageApi, contextHolder] = message.useMessage()
     const onFinish = async (values: any) => {
-        // if (values.username === 'admin' && values.password == '123456') {
-        //     navigate('/home')
-        // }
-
         const { data: res } = await login({
             username: values.username,
             password: values.password,
@@ -40,27 +43,35 @@ const Login: React.FC = () => {
             return
         }
         setLocalStorage('token', res.token)
+        dispatch(setUser(res.userInfo))
+        // signin(res.userInfo.username, () => {})
         navigate('/home')
         message.success('登录成功')
     }
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false)
     const handleRegister = () => {
-        console.log(1)
         setModalIsOpen(true)
     }
     const changeIsOpen = (currentState: boolean) => {
         setModalIsOpen(currentState)
     }
-    useEffect(() => {
-        initLoginBg()
-        window.onresize = function () {
-            initLoginBg()
-        }
-    })
+    // useEffect(() => {
+    //     const handleResize = () => {
+    //         // initLoginBg()
+    //     }
+
+    //     // initLoginBg()
+
+    //     window.addEventListener('resize', handleResize)
+
+    //     return () => {
+    //         window.removeEventListener('resize', handleResize)
+    //     }
+    // }, [])
 
     return (
         <div className="login-main">
-            <canvas id="canvas" style={{ display: 'block' }}></canvas>
+            {/* <canvas id="canvas" style={{ display: 'block' }}></canvas> */}
             <Form
                 name="normal_login"
                 className="login-form"
@@ -68,12 +79,9 @@ const Login: React.FC = () => {
                 onFinish={onFinish}
                 autoComplete="off"
             >
-                <h1 className="title">智慧交通标志检测系统</h1>
+                <h1 className="title text-[#1677ff]">智慧交通标志检测系统</h1>
                 <Form.Item name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
-                    <Input
-                        prefix={<UserOutlined className="site-form-item-icon" />}
-                        placeholder="请输入用户名"
-                    />
+                    <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="请输入用户名" />
                 </Form.Item>
                 <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
                     <Input.Password

@@ -1,8 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { Form, Input, Modal, message } from 'antd'
-import { useForm } from 'antd/es/form/Form'
 import { registerUser } from '@/utils/user'
-import { Rule } from 'antd/es/form'
 
 interface RefisterModalProps {
     modalIsOpen?: boolean
@@ -20,7 +18,7 @@ const RegisterModal: React.FC<RefisterModalProps> = ({
 }: RefisterModalProps) => {
     const [modalOpen, setModalOpen] = useState<boolean>(false)
     const [messageApi, contextHolder] = message.useMessage()
-    const [form] = useForm()
+    const [form] = Form.useForm()
     const handleSend = () => {
         console.log(form.getFieldsValue())
         form.validateFields()

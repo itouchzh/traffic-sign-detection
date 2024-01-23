@@ -1,7 +1,6 @@
-export interface IOptions {
-    label: string
-    value: string
-}
+import { IOptions } from '../components/interface'
+import { basicList } from './formItemsConfig'
+
 export const listTypeOption: IOptions[] = [
     { label: 'text', value: 'text' },
     { label: 'picture', value: 'picture' },
@@ -58,5 +57,5 @@ export const alertTypeOptions: IOptions[] = [
     { label: 'warning', value: 'warning' },
     { label: 'error', value: 'error' },
 ]
-
-
+const itemsToExclude = ['text', 'html', 'alert', 'button']
+export const INFORMITEM = [...basicList.map((item) => item.type).filter((item) => !itemsToExclude.includes(item))]

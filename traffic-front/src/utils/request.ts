@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { message, notification } from "antd";
 import { getLocalStorage } from './storage';
-import { useNavigate } from 'react-router-dom';
 // 定义接口返回类型
 interface ResponseData {
     code: number;
@@ -85,7 +84,6 @@ instance.interceptors.response.use(
                 message: "状态异常",
             });
         }
-        // 对响应错误做些什么
         return Promise.reject(error);
     },
 );

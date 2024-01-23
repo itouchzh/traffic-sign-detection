@@ -1,21 +1,22 @@
 import request from './request'
 
-interface LoginParams<T> {
-    username: T,
-    password: T,
+export interface LoginParams<T> {
+    username: T
+    password: T
     vercode?: T
 }
 
 interface user<T> {
-    id?: T,
-    username: T,
-    password?: T,
-    email?: T,
-    phone?: T,
-    address?: T,
-    status?: T,
-    carNumber?: T,
+    id?: T
+    username: T
+    password?: T
+    email?: T
+    phone?: T
+    address?: T
+    status?: T
+    carNumber?: T
     carId?: T
+    [key: string]: any
 }
 
 export const getCaptcha = () => {
@@ -31,16 +32,13 @@ export const registerUser = (data: LoginParams<string>) => {
     return request.post('/register', data)
 }
 
-
 export const getAllUsers = () => {
     return request.get('/getAllUsers')
 }
 
-
 export const addOneUser = (params: user<string>) => {
     return request.post('/addOneUser', params)
 }
-
 
 export const editUserById = (params: user<string>) => {
     return request.post(`/changeUser/${params.id}`, params)
@@ -49,7 +47,6 @@ export const editUserById = (params: user<string>) => {
 export const deleteUserById = (id: string) => {
     return request.delete(`/deteteUser/${id}`)
 }
-
 
 export const findUserById = (id: string) => {
     return request.post('/getOneUser', { id: id })

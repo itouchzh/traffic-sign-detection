@@ -3,12 +3,19 @@
  */
 import { useCallback } from 'react'
 
-const useStopPropagation = (callback: Function, ...args: any[]) => {
+type CallbackFunction = (...args: any[]) => void
+
+const useStopPropagation = (callback: CallbackFunction) => {
     const handleClick = useCallback(
-        (e: any) => {
-            e.stopPropagation()
-            callback(args)
-        },
+        (...args: any[]) =>
+            (e: React.MouseEvent<HTMLDivElement>) => {
+                e.stopPropagation()
+                if (args.length > 0) {
+                    callback(...args)
+                } else {
+                    callback()
+                }
+            },
         [callback]
     )
 

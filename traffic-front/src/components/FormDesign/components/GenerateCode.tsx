@@ -1,24 +1,17 @@
-import { Modal, Tabs } from 'antd'
-import React, {
-    ForwardRefRenderFunction,
-    useEffect,
-    useImperativeHandle,
-    useState,
-} from 'react'
+import { Button, Modal, Tabs, message } from 'antd'
+import React, { ForwardRefRenderFunction, useCallback, useEffect, useImperativeHandle, useState } from 'react'
 import type { TabsProps } from 'antd'
+import { CopyOutlined } from '@ant-design/icons'
 import CodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { generateReactTSXCode } from '@/utils/formD/generate'
-
 interface IGenerateCodeProps {
     data?: any
 }
-const GenerateCode: ForwardRefRenderFunction<unknown, IGenerateCodeProps> = (
-    { data }: IGenerateCodeProps,
-    ref
-) => {
+const GenerateCode: ForwardRefRenderFunction<unknown, IGenerateCodeProps> = ({ data }: IGenerateCodeProps, ref) => {
     const [isModalOpen, setModalOpen] = useState(false)
     const [reactCodeTSX, setReactCodeTSX] = useState<string>('')
+    const [messageApi, contextHolder] = message.useMessage()
     useEffect(() => {
         setReactCodeTSX(generateReactTSXCode(data as any))
     }, [data])
@@ -35,9 +28,7 @@ const GenerateCode: ForwardRefRenderFunction<unknown, IGenerateCodeProps> = (
     })
     const exportCode = (content: any, filename: string = 'demo.tsx') => {
         const element = document.createElement('a')
-        const file = `data:text/javascript;charset=utf-8,${encodeURIComponent(
-            reactCodeTSX
-        )}`
+        const file = `data:text/javascript;charset=utf-8,${encodeURIComponent(reactCodeTSX)}`
         element.href = file
         element.download = filename
         document.body.appendChild(element)
@@ -48,6 +39,15 @@ const GenerateCode: ForwardRefRenderFunction<unknown, IGenerateCodeProps> = (
     const codeChange = (value: string) => {
         setReactCodeTSX(value)
     }
+
+    const handleCopyClick = useCallback(async () => {
+        try {
+            await navigator.clipboard.writeText(reactCodeTSX)
+            messageApi.info('复制成功')
+        } catch (err) {
+            messageApi.error('复制失败')
+        }
+    }, [reactCodeTSX])
     const items: TabsProps['items'] = [
         {
             key: '1',
@@ -63,7 +63,6 @@ const GenerateCode: ForwardRefRenderFunction<unknown, IGenerateCodeProps> = (
                             typescript: true,
                         }),
                     ]}
-                    
                     onChange={codeChange}
                 />
             ),
@@ -76,6 +75,7 @@ const GenerateCode: ForwardRefRenderFunction<unknown, IGenerateCodeProps> = (
     ]
     return (
         <>
+            {contextHolder}
             <Modal
                 title="生成代码"
                 open={isModalOpen}
@@ -85,6 +85,17 @@ const GenerateCode: ForwardRefRenderFunction<unknown, IGenerateCodeProps> = (
                 okText="导出代码"
                 width={850}
                 className="m-auto"
+                footer={
+                    <>
+                        <Button type="primary" icon={<CopyOutlined />} onClick={handleCopyClick}>
+                            复制代码
+                        </Button>
+                        <Button type="primary" onClick={exportCode}>
+                            导出代码
+                        </Button>
+                        <Button onClick={handleCancel}>取消</Button>
+                    </>
+                }
             >
                 <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
             </Modal>

@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer } from 'react'
-import { Button, Divider, Input } from 'antd'
+import { Button, Col, Divider, Input, InputNumber, Row } from 'antd'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash'
 
@@ -21,11 +21,7 @@ interface IChangeOptiopProps {
     type: string
     onChange: (options: Array<IOption>) => void
 }
-const ChangeOption: React.FC<IChangeOptiopProps> = ({
-    options,
-    type,
-    onChange,
-}: IChangeOptiopProps) => {
+const ChangeOption: React.FC<IChangeOptiopProps> = ({ options, type, onChange }: IChangeOptiopProps) => {
     /**
      * @param state
      * @param actions
@@ -38,6 +34,9 @@ const ChangeOption: React.FC<IChangeOptiopProps> = ({
                 if (type === 'rules') {
                     return [...state, { pattern: '', message: '' }]
                 }
+                if (type === 'grid') {
+                    return [...state, { span: 12, list: [] }]
+                }
                 return [
                     ...state,
                     {
@@ -46,13 +45,11 @@ const ChangeOption: React.FC<IChangeOptiopProps> = ({
                     },
                 ]
             case 'delete':
-                return state.filter(
-                    (_, index) => index !== actions.payload.index
-                )
+                return state.filter((_, index) => index !== actions.payload.index)
             case 'modify':
+                console.log(state)
                 const currentState = cloneDeep(state)
-                currentState[actions.payload.index][actions.payload.label] =
-                    actions.payload.value
+                currentState[actions.payload.index][actions.payload.label] = actions.payload.value
                 return currentState
 
             default:
@@ -62,17 +59,12 @@ const ChangeOption: React.FC<IChangeOptiopProps> = ({
     const [selectOptions, dispatch] = useReducer(reducer, options)
 
     useEffect(() => {
+        console.log(selectOptions, 'selectOptions')
         onChange(cloneDeep(selectOptions))
     }, [selectOptions])
     return (
         <>
-            <div
-                className={
-                    ['select', 'checkbox', 'radio'].includes(type)
-                        ? ' '
-                        : 'hidden'
-                }
-            >
+            <div className={['select', 'checkbox', 'radio'].includes(type) ? ' ' : 'hidden'}>
                 <div className="max-h-40 overflow-auto">
                     {selectOptions?.map((option: IOption, index: number) => {
                         return (
@@ -122,11 +114,7 @@ const ChangeOption: React.FC<IChangeOptiopProps> = ({
                     })}
                 </div>
 
-                <Button
-                    type="link"
-                    icon={<PlusOutlined />}
-                    onClick={() => dispatch({ type: 'add' })}
-                >
+                <Button type="link" icon={<PlusOutlined />} onClick={() => dispatch({ type: 'add' })}>
                     添加一组
                 </Button>
             </div>
@@ -139,9 +127,7 @@ const ChangeOption: React.FC<IChangeOptiopProps> = ({
                                 className="bg-[#f8f8f8] p-1 hover:bg-blue-50 border-b-2 border-b-[#ffffff] border-solid"
                             >
                                 <div className="flex items-center">
-                                    <div className="min-w-[75px] cursor-default">
-                                        正则表达式
-                                    </div>
+                                    <div className="min-w-[75px] cursor-default">正则表达式</div>
                                     <Input
                                         placeholder="正则表达式"
                                         value={rule.pattern}
@@ -159,9 +145,7 @@ const ChangeOption: React.FC<IChangeOptiopProps> = ({
                                 </div>
 
                                 <div className="flex items-center mt-3">
-                                    <div className="min-w-[75px] cursor-default">
-                                        错误提示
-                                    </div>
+                                    <div className="min-w-[75px] cursor-default">错误提示</div>
                                     <Input
                                         placeholder="错误提示"
                                         value={rule.message}
@@ -192,11 +176,42 @@ const ChangeOption: React.FC<IChangeOptiopProps> = ({
                             </div>
                         ))}
                     </div>
-                    <Button
-                        type="link"
-                        icon={<PlusOutlined />}
-                        onClick={() => dispatch({ type: 'add' })}
-                    >
+                    <Button type="link" icon={<PlusOutlined />} onClick={() => dispatch({ type: 'add' })}>
+                        添加一组
+                    </Button>
+                </>
+            )}
+
+            {type === 'grid' && (
+                <>
+                    <div className="px-3">
+                        {selectOptions.map((item: any, index: number) => (
+                            <div className="mb-2">
+                                <Row gutter={10}>
+                                    <Col span={16}>
+                                        <InputNumber
+                                            max={24}
+                                            min={0}
+                                            value={item.span}
+                                            className="w-full"
+                                            onChange={(value) =>
+                                                dispatch({ type: 'modify', payload: { index, label: 'span', value } })
+                                            }
+                                        />
+                                    </Col>
+                                    <Col span={8}>
+                                        <Button
+                                            danger
+                                            shape="circle"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => dispatch({ type: 'delete', payload: { index } })}
+                                        ></Button>
+                                    </Col>
+                                </Row>
+                            </div>
+                        ))}
+                    </div>
+                    <Button type="link" icon={<PlusOutlined />} onClick={() => dispatch({ type: 'add' })}>
                         添加一组
                     </Button>
                 </>
